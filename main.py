@@ -1,24 +1,13 @@
+#! /usr/bin/python3
+import sys
+sys.path.append("./function")
+
 import tensorflow as tf
-from random import random
+import TrainData
 
-# 生成数据
-myLen = 10
-
-def getRandomList(length, multi):
-    rList = []
-    for i in range(length):
-        rList.append(random()*multi)
-    return rList
-
-def getTrainData(w_true):
-    data_x = getRandomList(myLen, 100)
-    data_y = 0
-    for i in range(myLen):
-        data_y += w_true[i] * data_x[i]
-    return [data_x, data_y]
-
-w_true = getRandomList(myLen, 1)
-
+# 定义数据
+myLen = 5
+w_true = TrainData.getRandomList(myLen, 1)
 
 # 已知的输入输出
 x_train = tf.placeholder(shape=[myLen], dtype=tf.float32)
@@ -39,13 +28,12 @@ sess.run(init)
 #开始训练
 loss_value = 0
 for i in range(500):
-    myData = getTrainData(w_true)
-    for j in range(500):
+    myData = TrainData.getTrainData(myLen, w_true)
+    for j in range(200):
         loss_value = sess.run([x_train, w, loss, train, y], feed_dict={x_train: myData[0], y_train: myData[1]})
-    print("i = %d, j = %d:" %(i, j))
-    print("loss = %f" %(loss_value[2]))
-    print("w = ")
-    print(loss_value[1])
+    print("i = %d:" %i)
+    print("\tloss = %f" %(loss_value[2]))
+    print("\tw = ", loss_value[1])
 
 print("w_true = ")
 print(w_true)
