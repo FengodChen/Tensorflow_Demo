@@ -9,7 +9,7 @@ import TrainData
 tf.compat.v1.disable_eager_execution()
 
 # 定义数据
-myLen = 500
+myLen = 50
 w_true = TrainData.getRandomList(myLen, 1)
 
 # 已知的输入输出
@@ -30,13 +30,29 @@ sess.run(init)
 
 #开始训练
 loss_value = 0
-for i in range(1000):
+for i in range(5000):
     myData = TrainData.getTrainData(myLen, w_true)
-    for j in range(50000):
+    i_print = i % 100 == 0
+    had_iPrint = False
+    if(i_print):
+        print("Now is running Data NO.%d" %i)
+        had_iPrint = True
+    j = 0
+    pre_loss = [0, 0]
+    while(True):
+        j = j+1
         loss_value = sess.run([x_train, w, loss, train, y], feed_dict={x_train: myData[0], y_train: myData[1]})
-    print("i = %d:" %i)
-    print("\tloss = %f" %(loss_value[2]))
-    print("\tw = ", loss_value[1])
+        if(j%100 == 0):
+            if(not had_iPrint):
+                print("Now is running Data NO.%d" %i)
+                had_iPrint = True
+            print("\tLoop of the Data is NO.%d: loss = %f" %(j, loss_value[2]))
+        if(abs(loss_value[2] - pre_loss[0]) <= 0.000001):
+            break
+        pre_loss[0], pre_loss[1] = pre_loss[1], loss_value[2]
+        
 
+print("w = ")
+print(loss_value[1])
 print("w_true = ")
 print(w_true)
