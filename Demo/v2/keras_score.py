@@ -37,13 +37,20 @@ while(True):
         model = tf.keras.Sequential()
         # 添加神经网络层，此处使用Dense全连接层，其中参数代表输出数
         # 使用Dropout代表有几率断连，防止神经网络过拟合
-        # 使用Sigmoid函数将答案转成是与不是
+
+        # 此层用来学习权重
         model.add(layers.Dense(5))
         model.add(layers.Dropout(0.2))
+        # 此层用来适应激活函数
+        model.add(layers.Dense(5))
+        model.add(layers.Dropout(0.2))
+        # 此层调用激活函数逼近得到二值化结果
         model.add(layers.Dense(1, activation='sigmoid'))
+        #model.add(layers.Dense(1, activation='tanh'))
+        #model.add(layers.Dense(1, activation='relu'))
 
         # 指定模型loss为最小二乘误差mse，优化器使用随机梯度下降优化器sgd，使用监视器监视accuracy情况
-        model.compile(loss = 'mae',
+        model.compile(loss = 'mse', # list: ['mae', 'mse']
                       optimizer=tf.keras.optimizers.Adam(0.001),
                       metrics=['accuracy'])
         print("Created")
@@ -62,15 +69,14 @@ while(True):
 
 # 随机生成输入x和输出y
 def f(x):
-    w = np.random.random((5))
-    w_sum = np.sum(w)
-    w_ = w/w_sum
+    w_ = np.array([0.5, 0.15, 0.35, 0.05, 0.05])
+    # 矩阵乘积
     y = np.matmul(x, w_)
-    return (y.reshape(y.size, 1)) > 50
-    
-# 训练数据，设置输入数据为x输出数据为y，每次喂入数据大小为32，verbose为1表示以进度条
-# 方式显示训练进度（0为不显示，2为一行显示一条），总共重复训练10次
-# 可输入数字规定重复几次上述行为
+    # 矩阵转置
+    y = y.reshape(y.size, 1)
+    # 对y中每一个元素，若>60则为1，反之则为0
+    return np.where(y > 60, 1, 0)
+
 while(True):
     try:
         loop_n = int(input("Fit Loop Number: "))
@@ -80,16 +86,23 @@ while(True):
         continue
 for loop in range(loop_n):
     print("Loop %d:" %loop)
-    x = (np.random.random((100000,5))*100).astype(np.int8).astype(np.float)
+    # 正态分布矩阵，mu=0.6，sigma=0.3，形状为(100000*5)
+    x = np.random.normal(0.6, 0.3, (100000,5))*100
+    # 因为成绩范围为0到100，所以将其控制在0到100范围内
+    x = np.where(x > 100, 100, x)
+    x = np.where(x < 0, 0, x)
+    # 因为成绩为整数，故转成整数，因为feed_dict只能是float型，故再转成float
+    x = x.astype(np.int8).astype(np.float)
+    # 训练数据，设置输入数据为x输出数据为y，每次喂入数据大小batch_size，verbose为1表示以进度条
+    # 方式显示训练进度（0为不显示，2为一行显示一条），总共重复训练epochs次
     model.fit(x, f(x), batch_size=32, verbose=1, epochs=10)
-
-# 保存model至./model_save/keras_pro.h5
-# 若未保存成功则输出错误信息
-try:
-    model.save('model_save/keras_pro.h5')
-    print("Saved Model to './model_save/keras_score.h5'")
-except:
-    print("ERROR WHEN SAVE MODEL")
+    # 保存model至./model_save/keras_pro.h5
+    # 若未保存成功则输出错误信息
+    try:
+        model.save('model_save/keras_score.h5')
+        print("Saved Model to './model_save/keras_score.h5'")
+    except:
+        print("ERROR WHEN SAVE MODEL")
 
 # 打印MODEL的概述
 model.summary()
@@ -99,8 +112,11 @@ while(True):
     m = input()
     if(m == '0'):
         break
-    x_ = (np.random.random((1, 5))*100).astype(np.int8).astype(np.float)
-    y_ = (model.predict(x_).astype(np.bool))[0, 0]
+    x_ = np.random.normal(0.6, 0.3, (1,5))*100
+    x_ = np.where(x_ > 100, 100, x_)
+    x_ = np.where(x_ < 0, 0, x_)
+    x_ = x_.astype(np.int8).astype(np.float)
+    y_ = (model.predict(x_))[0, 0]
     y_t = f(x_)[0, 0]
     print("Predict:")
     print("x = ")
