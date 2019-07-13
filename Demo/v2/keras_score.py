@@ -109,10 +109,26 @@ model.summary()
 
 # 上面已经训练好了model，下面通过model.predict()函数，输入x_预测y_，并计算正确答案以检验训练效果
 while(True):
-    m = input()
+
+    print("Option:")
+    print("\t1>>Input")
+    print("\t2>>Random")
+    print("\t0>>Exit")
+    m = input('choose: ')
     if(m == '0'):
-        break
-    x_ = np.random.normal(0.6, 0.3, (1,5))*100
+        exit(1)
+    elif(m == '1'):
+        print("Print 5 float:")
+        try:
+            x_ = [[input(), input(), input(), input(), input()]]
+            x_ = np.array(x_)
+            x_ = x_.astype(np.float)
+        except:
+            print("ERROR INPUT")
+            continue
+    elif(m == '2'):
+        x_ = np.random.normal(0.6, 0.3, (1,5))*100
+    
     x_ = np.where(x_ > 100, 100, x_)
     x_ = np.where(x_ < 0, 0, x_)
     x_ = x_.astype(np.int8).astype(np.float)
