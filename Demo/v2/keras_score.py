@@ -104,15 +104,26 @@ for loop in range(loop_n):
     except:
         print("ERROR WHEN SAVE MODEL")
 
-# 打印MODEL的概述
-model.summary()
-
 # 上面已经训练好了model，下面通过model.predict()函数，输入x_预测y_，并计算正确答案以检验训练效果
-while(True):
+def Predict_X(x_):
+    x_ = np.where(x_ > 100, 100, x_)
+    x_ = np.where(x_ < 0, 0, x_)
+    x_ = x_.astype(np.int8).astype(np.float)
+    y_ = (model.predict(x_))[0, 0]
+    y_t = f(x_)[0, 0]
+    print("Predict:")
+    print("x = ")
+    print(x_)
+    print("y_predict = ")
+    print(y_)
+    print("y_true = ")
+    print(y_t)
 
+while(True):
     print("Option:")
     print("\t1>>Input")
     print("\t2>>Random")
+    print("\t3>>Model Summary")
     print("\t0>>Exit")
     m = input('choose: ')
     if(m == '0'):
@@ -126,18 +137,13 @@ while(True):
         except:
             print("ERROR INPUT")
             continue
+        Predict_X(x_)
+        continue
     elif(m == '2'):
         x_ = np.random.normal(0.6, 0.3, (1,5))*100
-    
-    x_ = np.where(x_ > 100, 100, x_)
-    x_ = np.where(x_ < 0, 0, x_)
-    x_ = x_.astype(np.int8).astype(np.float)
-    y_ = (model.predict(x_))[0, 0]
-    y_t = f(x_)[0, 0]
-    print("Predict:")
-    print("x = ")
-    print(x_)
-    print("y_predict = ")
-    print(y_)
-    print("y_true = ")
-    print(y_t)
+        Predict_X(x_)
+        continue
+    elif(m == '3'):
+        # 打印MODEL的概述
+        model.summary()
+        continue
