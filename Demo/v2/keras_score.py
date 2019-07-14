@@ -35,7 +35,7 @@ while(True):
         # 如果没有已保存的则自己创建
         # 使用Sequential模型
         model = tf.keras.Sequential()
-        # 添加神经网络层，此处使用Dense全连接层，其中参数代表输出数
+        # 添加神经网络层，此处使用Dense全连接层，其中参数代表该层神经元数
         # 使用Dropout代表有几率断连，防止神经网络过拟合
 
         # 此层用来学习权重

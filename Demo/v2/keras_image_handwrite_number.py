@@ -59,8 +59,10 @@ while(True):
         # 如果没有已保存的则自己创建
         # 使用Sequential模型
         model = tf.keras.Sequential()
-        # 添加神经网络层，此处使用Dense全连接层，其中参数代表输出数
+        # 添加神经网络层，此处使用Dense全连接层，其中参数代表该层神经元数
         # 使用Dropout代表有几率断连，防止神经网络过拟合
+        # 使用Flatten层将多维的输入一维化，用于连接Conv2D和Dense层
+        # Conv2D卷积层要求输入四维Tensor，参数代表卷积核数量，即提取多少种特征
         model.add(tf.keras.layers.Conv2D(32, (3, 3), activation='relu'))
         model.add(tf.keras.layers.Conv2D(64, (3, 3), activation='relu'))
         model.add(tf.keras.layers.Conv2D(128, (3, 3), activation='relu'))
@@ -71,7 +73,7 @@ while(True):
         model.add(tf.keras.layers.Dense(train_len, activation='softmax'))
 
 
-        # 指定模型loss，优化器使用随机梯度下降优化器，使用监视器监视accuracy情况
+        # 指定模型loss为交叉熵损失函数，优化器使用随机梯度下降优化器，使用监视器监视accuracy情况
         model.compile(loss = tf.losses.categorical_crossentropy,
                       optimizer=tf.keras.optimizers.Adam(0.001),
                       metrics=['accuracy'])
@@ -109,33 +111,62 @@ for loop in range(loop_n):
         print("ERROR WHEN SAVE MODEL")
 
 # 上面已经训练好了model，下面通过model.predict()函数，输入x_预测y_，并计算正确答案以检验训练效果
-def Predict_X(x_num):
-    y_predict = model.predict(x_test[x_num])
-    y_true = y_test[x_num]
-    print("Predict:")
-    print("y_predict = ")
-    print(y_predict)
-    print("y_true = ")
-    print(y_true)
+def Predict_X(x_arg_list, list_len = 0):
+    i = 0
+    plt.figure(figsize=(6, 6))
+    for x_arg in x_arg_list:
+        i = i + 1
+        # 由数组提取一个测试图像并转换成四维矩阵以便Keras神经网络预测
+        x_test_ = np.reshape(x_test[x_arg], (1, img_rows, ima_cols, 1))
+        # 得到预测值和真实值的独热编码
+        y_predict = model.predict(x_test_)
+        y_true = y_test[x_arg]
+        # 将独热编码还原成人类可读数字
+        y_predict = np.argmax(y_predict)
+        y_true = np.argmax(y_true)
+        # 在一个面板中绘制多个图像，行数为1，列数为list_len，绘制第i个
+        plt.subplot(1, list_len, i)
+        plt.imshow(x_test_[0, :, :, 0], cmap='gray')
+        predictAns = "Predict: " + str(y_predict) + "\nAnswer: " + str(y_true)
+        plt.title(predictAns)
+        plt.axis('off')
+    plt.show()
 
 while(True):
     print("Option:")
     print("\t1>>Input")
-    print("\t2>>Model Summary")
+    print("\t2>>Random")
+    print("\t3>>Model Summary")
     print("\t0>>Exit")
     m = input('choose: ')
     if(m == '0'):
         exit(1)
     elif(m == '1'):
+        # 输入x_arg从test集中选取x_test[x_arg]并调用函数显示预测结果
         print("Input an integer:")
         try:
-            x_num = int(input())
+            x_arg_list = []
+            x_arg_list.append(int(input()))
         except:
             print("ERROR INPUT")
             continue
-        Predict_X(x_num)
+        Predict_X(x_arg_list)
         continue
     elif(m == '2'):
+        # 生成list_len个随机数并调用函数显示预测结果
+        x_arg_list = []
+        test_list_len = len(x_test)
+        print("Input random list length:")
+        try:
+            list_len = int(input())
+        except:
+            print("ERROR INPUT")
+            continue
+        for i in range(list_len):
+            x_arg_list.append(np.random.randint(test_list_len))
+        Predict_X(x_arg_list, list_len=list_len)
+        continue
+    elif(m == '3'):
         # 打印MODEL的概述
         model.summary()
         continue
