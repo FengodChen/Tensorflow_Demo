@@ -111,7 +111,7 @@ for loop in range(loop_n):
     print("Loop %d/%d:" %(loop, loop_n))
     # 训练数据，设置输入数据为x输出数据为y，每次喂入数据大小batch_size，verbose为1表示以进度条
     # 方式显示训练进度（0为不显示，2为一行显示一条），总共重复训练epochs次
-    model.fit(x_train, y_train, batch_size=128, verbose=1, epochs=10)
+    model.fit(x_train, y_train, batch_size=32, verbose=1, epochs=10)
     # 保存model，若未保存成功则输出错误信息
     try:
         model.save(savePath)
