@@ -12,7 +12,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 # 禁用tensorflow通知信息
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'  # or any {'0', '2', '3'}
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '0'  # or any {'0', '2', '3'}
 
 # 定义保存路径
 savePath = 'model_save/keras_image_handwrite_number.h5'
