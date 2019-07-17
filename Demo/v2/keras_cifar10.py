@@ -142,11 +142,10 @@ def Predict_X(x_arg_list, list_len = 1):
     for x_arg in x_arg_list:
         i = i + 1
         # 由数组提取一个测试图像并转换成四维矩阵以便Keras神经网络预测
-        # x_test_ = np.reshape(x_test[x_arg], (1, img_rows, ima_cols, 1))
         x_test_ = []
         x_test_.append(x_test[x_arg])
+        x_test_ = np.array(x_test_)
         # 得到预测值和真实值的独热编码
-        # x_test_ = np.zeros((1,32,32,3))
         y_predict = model.predict(x_test_)
         y_true = y_test[x_arg]
         # 将独热编码还原成人类可读数字
