@@ -15,6 +15,7 @@ from datetime import datetime
 # 禁用tensorflow通知信息
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '0'  # or any {'0', '2', '3'}
 
+# 控制参数
 tensorboard_callback = 0
 enableLog = False
 
@@ -76,28 +77,59 @@ while(True):
         # Conv2D卷积层要求输入四维Tensor，参数代表卷积核数量，即提取多少种特征
         # MaxPool2D最大值池化层可以防止过拟合以及大大减少训练以及推理时间
         # BatchNoramlization标准化层使其更泛化以及更快地训练
-        model.add(tf.keras.layers.Conv2D(64, (3, 3), activation='relu'))
+        '''
+        model.add(tf.keras.layers.Conv2D(32, (3, 3)))
+        model.add(tf.keras.layers.Activation('relu'))
         model.add(tf.keras.layers.BatchNormalization())
-        model.add(tf.keras.layers.MaxPool2D())
-
+        model.add(tf.keras.layers.MaxPooling2D())
         model.add(tf.keras.layers.Dropout(0.25))
 
-        model.add(tf.keras.layers.Conv2D(128, (3, 3), activation='relu'))
+        model.add(tf.keras.layers.Conv2D(64, (3, 3)))
+        model.add(tf.keras.layers.Activation('relu'))
         model.add(tf.keras.layers.BatchNormalization())
-        model.add(tf.keras.layers.MaxPool2D())
-
+        model.add(tf.keras.layers.MaxPooling2D())
         model.add(tf.keras.layers.Dropout(0.25))
 
-        model.add(tf.keras.layers.Conv2D(256, (3, 3), activation='relu'))
+        model.add(tf.keras.layers.Conv2D(128, (3, 3)))
+        model.add(tf.keras.layers.Activation('relu'))
         model.add(tf.keras.layers.BatchNormalization())
-        model.add(tf.keras.layers.MaxPool2D())
-
+        model.add(tf.keras.layers.MaxPooling2D())
         model.add(tf.keras.layers.Dropout(0.25))
+        '''
+
+        model.add(tf.keras.layers.Conv2D(64, (3, 3)))
+        model.add(tf.keras.layers.Activation('relu'))
+        model.add(tf.keras.layers.BatchNormalization())
+        model.add(tf.keras.layers.MaxPooling2D())
+        model.add(tf.keras.layers.Dropout(0.25))
+
+        model.add(tf.keras.layers.Conv2D(256, (3, 3)))
+        model.add(tf.keras.layers.Activation('relu'))
+        model.add(tf.keras.layers.BatchNormalization())
+        model.add(tf.keras.layers.MaxPooling2D())
+        model.add(tf.keras.layers.Dropout(0.25))
+
+        model.add(tf.keras.layers.Conv2D(1024, (3, 3)))
+        model.add(tf.keras.layers.Activation('relu'))
+        model.add(tf.keras.layers.BatchNormalization())
+        model.add(tf.keras.layers.MaxPooling2D())
+        model.add(tf.keras.layers.Dropout(0.25))
+
         model.add(tf.keras.layers.Flatten())
 
-        model.add(tf.keras.layers.Dense(128, activation='relu'))
+        model.add(tf.keras.layers.Dense(1024))
+        model.add(tf.keras.layers.Activation('relu'))
         model.add(tf.keras.layers.BatchNormalization())
+        model.add(tf.keras.layers.Dropout(0.25))
 
+        model.add(tf.keras.layers.Dense(512))
+        model.add(tf.keras.layers.Activation('relu'))
+        model.add(tf.keras.layers.BatchNormalization())
+        model.add(tf.keras.layers.Dropout(0.25))
+
+        model.add(tf.keras.layers.Dense(128))
+        model.add(tf.keras.layers.Activation('relu'))
+        model.add(tf.keras.layers.BatchNormalization())
         model.add(tf.keras.layers.Dropout(0.25))
 
         model.add(tf.keras.layers.Dense(train_len, activation='softmax'))
