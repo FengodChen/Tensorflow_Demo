@@ -22,6 +22,9 @@ tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=logdir)
 # 定义保存路径
 savePath = 'model_save/keras_cifar10.h5'
 
+# 10个类的对应列表
+ansList = ['Plane', 'Car', 'Bird', 'Cat', 'Deer', 'Dog', 'Frog', 'Horse', 'Ship', 'Truck']
+
 # 加载并处理MINST
 (x_train, y_train), (x_test, y_test) = tf.keras.datasets.cifar10.load_data()
 
@@ -114,26 +117,24 @@ while(True):
 
 while(True):
     try:
-        loop_n = int(input("Fit Loop Number: "))
+        epochs = int(input("Epochs Number: "))
         break
     except:
         print("ERROR INPUT")
         continue
-for loop in range(loop_n):
-    print("Loop %d/%d:" %(loop, loop_n))
-    # 训练数据，设置输入数据为x输出数据为y，每次喂入数据大小batch_size，verbose为1表示以进度条
-    # 方式显示训练进度（0为不显示，2为一行显示一条），总共重复训练epochs次
-    model.fit(x_train, y_train, 
-              batch_size=32, 
-              verbose=1, 
-              epochs=10,
-              callbacks=[tensorboard_callback])
-    # 保存model，若未保存成功则输出错误信息
-    try:
-        model.save(savePath)
-        print("Saved Model to:", savePath)
-    except:
-        print("ERROR WHEN SAVE MODEL")
+# 训练数据，设置输入数据为x输出数据为y，每次喂入数据大小batch_size，verbose为1表示以进度条
+# 方式显示训练进度（0为不显示，2为一行显示一条），总共重复训练epochs次
+model.fit(x_train, y_train, 
+          batch_size=128, 
+          verbose=1, 
+          epochs=epochs,
+          callbacks=[tensorboard_callback])
+# 保存model，若未保存成功则输出错误信息
+try:
+    model.save(savePath)
+    print("Saved Model to:", savePath)
+except:
+    print("ERROR WHEN SAVE MODEL")
 
 # 上面已经训练好了model，下面通过model.predict()函数，输入x_预测y_，并计算正确答案以检验训练效果
 def Predict_X(x_arg_list, list_len = 1):
@@ -154,7 +155,7 @@ def Predict_X(x_arg_list, list_len = 1):
         # 在一个面板中绘制多个图像，行数为1，列数为list_len，绘制第i个
         plt.subplot(1, list_len, i)
         plt.imshow(x_test_[0, :, :, 0], cmap='gray')
-        predictAns = "Predict: " + str(y_predict) + "\nAnswer: " + str(y_true)
+        predictAns = "Predict: " + ansList[y_predict] + "\nAnswer: " + ansList[y_true]
         plt.title(predictAns)
         plt.axis('off')
     plt.show()
