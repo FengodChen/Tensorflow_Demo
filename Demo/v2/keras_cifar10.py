@@ -16,7 +16,7 @@ from datetime import datetime
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '0'  # or any {'0', '2', '3'}
 
 # Tensorboard可视化
-logdir="../../Log/scalars" + datetime.now().strftime("%Y%m%d-%H%M%S")
+logdir="../../Log/scalars/" + datetime.now().strftime("%Y%m%d-%H%M%S")
 tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=logdir)
 
 # 定义保存路径
