@@ -15,7 +15,7 @@ from matplotlib import pyplot as plt
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '0'  # or any {'0', '2', '3'}
 
 # 定义保存路径
-savePath = 'model_save/keras_image_handwrite_number.h5'
+savePath = 'model_save/keras_image_handwrite_number_v1.h5'
 
 # 加载并处理MINST
 (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
