@@ -130,7 +130,7 @@ for loop in range(loop_n):
         print("ERROR WHEN SAVE MODEL")
 
 # 上面已经训练好了model，下面通过model.predict()函数，输入x_预测y_，并计算正确答案以检验训练效果
-def Predict_X(x_arg_list, list_len = 0):
+def Predict_X(x_arg_list, list_len = 1):
     i = 0
     plt.figure(figsize=(6, 6))
     for x_arg in x_arg_list:

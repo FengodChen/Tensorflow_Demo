@@ -1,18 +1,23 @@
 #! /usr/bin/python3
 
 '''
-【识别手写数字】：
+【分类】：
 
-导入MNIST库学习并识别手写数字
+导入CIFAR10库学习并分类
 '''
 
 import os
 import tensorflow as tf
 import numpy as np
 from matplotlib import pyplot as plt
+from datetime import datetime
 
 # 禁用tensorflow通知信息
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '0'  # or any {'0', '2', '3'}
+
+# Tensorboard可视化
+logdir="../../Log/scalars" + datetime.now().strftime("%Y%m%d-%H%M%S")
+tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=logdir)
 
 # 定义保存路径
 savePath = 'model_save/keras_cifar10.h5'
@@ -118,7 +123,11 @@ for loop in range(loop_n):
     print("Loop %d/%d:" %(loop, loop_n))
     # 训练数据，设置输入数据为x输出数据为y，每次喂入数据大小batch_size，verbose为1表示以进度条
     # 方式显示训练进度（0为不显示，2为一行显示一条），总共重复训练epochs次
-    model.fit(x_train, y_train, batch_size=32, verbose=1, epochs=10)
+    model.fit(x_train, y_train, 
+              batch_size=32, 
+              verbose=1, 
+              epochs=10,
+              callbacks=[tensorboard_callback])
     # 保存model，若未保存成功则输出错误信息
     try:
         model.save(savePath)
@@ -127,14 +136,17 @@ for loop in range(loop_n):
         print("ERROR WHEN SAVE MODEL")
 
 # 上面已经训练好了model，下面通过model.predict()函数，输入x_预测y_，并计算正确答案以检验训练效果
-def Predict_X(x_arg_list, list_len = 0):
+def Predict_X(x_arg_list, list_len = 1):
     i = 0
     plt.figure(figsize=(6, 6))
     for x_arg in x_arg_list:
         i = i + 1
         # 由数组提取一个测试图像并转换成四维矩阵以便Keras神经网络预测
-        x_test_ = np.reshape(x_test[x_arg], (1, img_rows, ima_cols, 1))
+        # x_test_ = np.reshape(x_test[x_arg], (1, img_rows, ima_cols, 1))
+        x_test_ = []
+        x_test_.append(x_test[x_arg])
         # 得到预测值和真实值的独热编码
+        # x_test_ = np.zeros((1,32,32,3))
         y_predict = model.predict(x_test_)
         y_true = y_test[x_arg]
         # 将独热编码还原成人类可读数字
