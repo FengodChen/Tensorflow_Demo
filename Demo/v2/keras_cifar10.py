@@ -15,9 +15,13 @@ from datetime import datetime
 # 禁用tensorflow通知信息
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '0'  # or any {'0', '2', '3'}
 
+tensorboard_callback = 0
+enableLog = False
+
 # Tensorboard可视化
-logdir="../../Log/scalars/" + datetime.now().strftime("%Y%m%d-%H%M%S")
-tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=logdir)
+def EnableLog():
+    logdir="../../Log/scalars/" + datetime.now().strftime("%Y%m%d-%H%M%S")
+    tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=logdir)
 
 # 定义保存路径
 savePath = 'model_save/keras_cifar10.h5'
@@ -50,6 +54,7 @@ y_test = tf.keras.utils.to_categorical(y_test, train_len)
 print("Option:")
 print("\t1>>New Model")
 print("\t2>>Load Model")
+print("\t3>>Enbale Log")
 print("\t0>>Exit")
 
 while(True):
@@ -112,6 +117,10 @@ while(True):
         except:
             print("No Model Found")
             continue
+    elif(opt == 3):
+        EnableLog()
+        enableLog = True
+        print("Enabled Log")
     else:
         print("No such a option")
 
@@ -124,11 +133,17 @@ while(True):
         continue
 # 训练数据，设置输入数据为x输出数据为y，每次喂入数据大小batch_size，verbose为1表示以进度条
 # 方式显示训练进度（0为不显示，2为一行显示一条），总共重复训练epochs次
-model.fit(x_train, y_train, 
-          batch_size=128, 
-          verbose=1, 
-          epochs=epochs,
-          callbacks=[tensorboard_callback])
+if(enableLog):
+    model.fit(x_train, y_train, 
+              batch_size=128, 
+              verbose=1, 
+              epochs=epochs,
+              callbacks=[tensorboard_callback])
+else:
+    model.fit(x_train, y_train, 
+              batch_size=128, 
+              verbose=1, 
+              epochs=epochs)
 # 保存model，若未保存成功则输出错误信息
 try:
     model.save(savePath)
@@ -154,7 +169,7 @@ def Predict_X(x_arg_list, list_len = 1):
         y_true = np.argmax(y_true)
         # 在一个面板中绘制多个图像，行数为1，列数为list_len，绘制第i个
         plt.subplot(1, list_len, i)
-        plt.imshow(x_test_[0, :, :, 0], cmap='gray')
+        plt.imshow(x_test_[0, :, :, :])
         predictAns = "Predict: " + ansList[y_predict] + "\nAnswer: " + ansList[y_true]
         plt.title(predictAns)
         plt.axis('off')
