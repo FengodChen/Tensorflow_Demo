@@ -18,7 +18,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '0'  # or any {'0', '2', '3'}
 # 宏定义变量
 tensorboard_callback = 0
 enableLog = False
-savePath = 'model_save/keras_rnn.h5'
+savePath = 'model_save/keras_rnn_LSTM.h5'
 num_words = 1000
 max_len = 200
 
