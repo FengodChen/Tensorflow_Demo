@@ -1,10 +1,5 @@
 from tensorflow import keras
-#import tensorflow as tf
-#keras = tf.keras
-#from tensorflow.keras import backend as K  
-#K.set_image_dim_ordering('tf') 
-#K = keras.backend
-#keras.backend.set_image_data_format('channels_last')
+import ssd_layer
 
 def SSD300(input_shape, classes_num):
     
@@ -53,4 +48,6 @@ def SSD300(input_shape, classes_num):
     net['conv8_2'] = keras.layers.Conv2D(256, (3, 3), activation='relu', padding='same')(net['conv8_1'])
     # Pool
     net['pool6'] = keras.layers.GlobalAvgPool2D()(net['conv8_2'])
+    # Prediction from conv4_3
     return net
+    #model = keras.Model(inputs = net['input'], outputs = net['pool6'])
