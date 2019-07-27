@@ -3,7 +3,7 @@ import ssd_layer
 
 def SSD300(input_shape, classes_num):
     
-    # 初始化
+    # Initialization
     net = {}
     img_size = (input_shape[1], input_shape[0])
     input_tensor = keras.layers.Input(shape=input_shape)
@@ -53,7 +53,6 @@ def SSD300(input_shape, classes_num):
     priors_num = 3
     name = 'conv4_3_norm_mbox_conf' + '_{}'.format(classes_num)
     net['conv4_3_norm'] = ssd_layer.Normalize(20, name='conv4_3_norm')(net['conv4_3'])
-    #net['conv4_3_norm'] = keras.layers.BatchNormalization(20, name='conv4_3_norm')(net['conv4_3'])
     net['conv4_3_norm_mbox_loc'] = keras.layers.Conv2D(priors_num*4, (3, 3), padding='same', name='conv4_3_norm_mbox_loc')(net['conv4_3_norm'])
     net['conv4_3_norm_mbox_loc_flat'] = keras.layers.Flatten(name='conv4_3_norm_mbox_loc_flat')(net['conv4_3_norm_mbox_loc'])
     net['conv4_3_norm_mbox_conf'] = keras.layers.Conv2D(priors_num*classes_num, (3, 3), padding='same',name=name)(net['conv4_3_norm'])
@@ -100,7 +99,7 @@ def SSD300(input_shape, classes_num):
     priors_num = 6
     name = 'pool6_mbox_conf_flat' + '_{}'.format(classes_num)
     net['pool6_mbox_loc_flat'] = keras.layers.Dense(priors_num * 4, name='pool6_mbox_loc_flat')(net['pool6'])
-    net['pool6_mbox_conf_flat'] = keras.layersDense(priors_num * classes_num, name=name)(net['pool6'])
+    net['pool6_mbox_conf_flat'] = keras.layers.Dense(priors_num * classes_num, name=name)(net['pool6'])
     net['pool6_reshaped'] = keras.layers.Reshape((1, 1, 256), name='pool6_reshaped')(net['pool6'])
     net['pool6_mbox_priorbox'] = ssd_layer.PriorBox(img_size, 276.0, max_size=330.0, aspect_ratios=[2, 3], variances=[0.1, 0.1, 0.2, 0.2], name='pool6_mbox_priorbox')(net['pool6_reshaped'])
 
@@ -125,11 +124,16 @@ def SSD300(input_shape, classes_num):
                                   net['conv7_2_mbox_priorbox'],
                                   net['conv8_2_mbox_priorbox'],
                                   net['pool6_mbox_priorbox']],
-                                 concat_axis=1, name='mbox_priorbox')
+                                 axis=1, name='mbox_priorbox')
     if hasattr(net['mbox_loc'], '_keras_shape'):
         num_boxes = net['mbox_loc']._keras_shape[-1] // 4
     elif hasattr(net['mbox_loc'], 'int_shape'):
         num_boxes = keras.backend.int_shape(net['mbox_loc'])[-1] // 4
+    # TODO
+    # Debug else
+    else:
+        num_boxes = keras.backend.int_shape(net['mbox_loc'])[-1] // 4
+    #print(num_boxes)
     net['mbox_loc'] = keras.layers.Reshape((num_boxes, 4),
                               name='mbox_loc_final')(net['mbox_loc'])
     net['mbox_conf'] = keras.layers.Reshape((num_boxes, classes_num),
