@@ -7,31 +7,33 @@ def SSD300(input_shape, classes_num):
     net = {}
     img_size = (input_shape[1], input_shape[0])
     input_tensor = keras.layers.Input(shape=input_shape)
+    vgg16_model = keras.applications.VGG16(include_top = False, input_shape = input_shape)
     # Input Layer
+    #net['input'] = vgg16_model.get_layer(index = 0)
     net['input'] = input_tensor
     # Block 1
-    net['conv1_1'] = keras.layers.Conv2D(64, (3, 3), activation='relu', padding='same', name='conv1_1')(net['input'])
-    net['conv1_2'] = keras.layers.Conv2D(64, (3, 3), activation='relu', padding='same', name='conv1_2')(net['conv1_1'])
-    net['pool1'] = keras.layers.MaxPool2D(strides=(2, 2), name='pool1')(net['conv1_2'])
+    net['conv1_1'] = vgg16_model.get_layer(index = 1)(net['input'])
+    net['conv1_2'] = vgg16_model.get_layer(index = 2)(net['conv1_1'])
+    net['pool1'] = vgg16_model.get_layer(index = 3)(net['conv1_2'])
     # Block 2
-    net['conv2_1'] = keras.layers.Conv2D(128, (3, 3), activation='relu', padding='same', name='conv2_1')(net['pool1'])
-    net['conv2_2'] = keras.layers.Conv2D(128, (3, 3), activation='relu', padding='same', name='conv2_2')(net['conv2_1'])
-    net['pool2'] = keras.layers.MaxPool2D(strides=(2, 2), name='pool2')(net['conv2_2'])
+    net['conv2_1'] = vgg16_model.get_layer(index = 4)(net['pool1'])
+    net['conv2_2'] = vgg16_model.get_layer(index = 5)(net['conv2_1'])
+    net['pool2'] = vgg16_model.get_layer(index = 6)(net['conv2_2'])
     # Block 3
-    net['conv3_1'] = keras.layers.Conv2D(256, (3, 3), activation='relu', padding='same', name='conv3_1')(net['pool2'])
-    net['conv3_2'] = keras.layers.Conv2D(256, (3, 3), activation='relu', padding='same', name='conv3_2')(net['conv3_1'])
-    net['conv3_3'] = keras.layers.Conv2D(256, (3, 3), activation='relu', padding='same', name='conv3_3')(net['conv3_2'])
-    net['pool3'] = keras.layers.MaxPool2D(strides=(2, 2), name='pool3')(net['conv3_3'])
+    net['conv3_1'] = vgg16_model.get_layer(index = 7)(net['pool2'])
+    net['conv3_2'] = vgg16_model.get_layer(index = 8)(net['conv3_1'])
+    net['conv3_3'] = vgg16_model.get_layer(index = 9)(net['conv3_2'])
+    net['pool3'] = vgg16_model.get_layer(index = 10)(net['conv3_3'])
     # Block 4
-    net['conv4_1'] = keras.layers.Conv2D(512, (3, 3), activation='relu', padding='same', name='conv4_1')(net['pool3'])
-    net['conv4_2'] = keras.layers.Conv2D(512, (3, 3), activation='relu', padding='same', name='conv4_2')(net['conv4_1'])
-    net['conv4_3'] = keras.layers.Conv2D(512, (3, 3), activation='relu', padding='same', name='conv4_3')(net['conv4_2'])
-    net['pool4'] = keras.layers.MaxPool2D(strides=(2, 2), name='pool4')(net['conv4_3'])
+    net['conv4_1'] = vgg16_model.get_layer(index = 11)(net['pool3'])
+    net['conv4_2'] = vgg16_model.get_layer(index = 12)(net['conv4_1'])
+    net['conv4_3'] = vgg16_model.get_layer(index = 13)(net['conv4_2'])
+    net['pool4'] = vgg16_model.get_layer(index = 14)(net['conv4_3'])
     # Block 5
-    net['conv5_1'] = keras.layers.Conv2D(512, (3, 3), activation='relu', padding='same', name='conv5_1')(net['pool4'])
-    net['conv5_2'] = keras.layers.Conv2D(512, (3, 3), activation='relu', padding='same', name='conv5_2')(net['conv5_1'])
-    net['conv5_3'] = keras.layers.Conv2D(512, (3, 3), activation='relu', padding='same', name='conv5_3')(net['conv5_2'])
-    net['pool5'] = keras.layers.MaxPool2D((2,2), strides=(2, 2), name='pool5')(net['conv5_3'])
+    net['conv5_1'] = vgg16_model.get_layer(index = 15)(net['pool4'])
+    net['conv5_2'] = vgg16_model.get_layer(index = 16)(net['conv5_1'])
+    net['conv5_3'] = vgg16_model.get_layer(index = 17)(net['conv5_2'])
+    net['pool5'] = vgg16_model.get_layer(index = 18)(net['conv5_3'])
     # FC 6 带扩张率（dilation_rate）参数的为带洞卷积（AtrousConvolution）
     net['fc6'] = keras.layers.Conv2D(1024, (3, 3), dilation_rate = 2, padding='same', name='fc6')(net['pool5'])
     # FC 7
@@ -145,7 +147,5 @@ def SSD300(input_shape, classes_num):
                                net['mbox_priorbox']],
                                axis=2, name='predictions')
     model = keras.models.Model(net['input'], net['predictions'])
-    return model
-    #return net
-    #model = keras.Model(inputs = net['input'], outputs = net['pool6'])
     #return model
+    return (vgg16_model, model)
