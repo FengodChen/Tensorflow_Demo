@@ -150,5 +150,6 @@ def SSD300(input_shape, classes_num):
     # Freezen VGG16 weight
     for vgg in model.layers[:19]:
         vgg.trainable = False
+    model.summary()
     return model
     # return (vgg16_model, model)
