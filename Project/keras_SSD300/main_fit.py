@@ -7,18 +7,18 @@ import matplotlib.pyplot as plt
 
 from tensorflow import keras
 from random import shuffle
+from xml.dom import minidom
 
 from ssd_utils import BBoxUtility
 from ssd_fit import MultiboxLoss
 from ssd_model import SSD300
 
-priors = pickle.load(open('prior_boxes_ssd300.pkl', 'rb'))
-
 class VOC_Generator():
     def __init__(self, voc_path, classes_list, input_shape):
+        self.voc_path = voc_path
+        self.classes_list = classes_list
         self.input_shape = input_shape
         self.classes_num = len(classes_list)
-        self.classes_list = classes_list
         self.classes_inf_nameprop = {}
         self.bbox = BBoxUtility(self.classes_num, pickle.load(open('prior_boxes_ssd300.pkl', 'rb')))
 
@@ -32,5 +32,20 @@ class VOC_Generator():
                 class_inf_nameprop[nameProp_split[0]] = nameProp_split[1]
             
             self.classes_inf_nameprop[class_name] = class_inf_nameprop
-            
-#bbox_util = BBoxUtility(NUM_CLASSES, priors)
+    
+    def getImaAndGT(self, img_ID, obj_Name):
+        objs_list = []
+        img_path = self.voc_path + '/JPEGImages/' + img_ID + '.jpg'
+        img_xml = self.voc_path + '/Annotations/' + img_ID + '.xml'
+        img = cv2.imread(img_path)
+        inf = minidom.parse(img_xml).documentElement
+        objs = inf.getElementsByTagName('object')
+        for obj in objs:
+            if (obj.getElementsByTagName('name')[0].childNodes[0].data == obj_Name):
+                obj_inf = {}
+                obj_inf['xmax'] = int(obj.getElementsByTagName('xmax')[0].childNodes[0].data)
+                obj_inf['xmin'] = int(obj.getElementsByTagName('xmin')[0].childNodes[0].data)
+                obj_inf['ymax'] = int(obj.getElementsByTagName('ymax')[0].childNodes[0].data)
+                obj_inf['ymin'] = int(obj.getElementsByTagName('ymin')[0].childNodes[0].data)
+                objs_list.append(obj_inf)
+        return (img, objs_list)
