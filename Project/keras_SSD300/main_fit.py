@@ -14,13 +14,17 @@ from ssd_fit import MultiboxLoss
 from ssd_model import SSD300
 
 class VOC_Generator():
+    '''
+    Classes List not include background class
+    '''
     def __init__(self, voc_path, classes_list, input_shape):
         self.voc_path = voc_path
         self.classes_list = classes_list
         self.input_shape = input_shape
         self.classes_num = len(classes_list)
         self.classes_inf_nameprop = {}
-        self.bbox = BBoxUtility(self.classes_num, pickle.load(open('prior_boxes_ssd300.pkl', 'rb')))
+        #self.bbox = BBoxUtility(self.classes_num, pickle.load(open('prior_boxes_ssd300.pkl', 'rb')))
+        self.bbox = None
 
         for class_name in self.classes_list:
             class_inf_nameprop = {}
@@ -49,3 +53,11 @@ class VOC_Generator():
                 obj_inf['ymin'] = int(obj.getElementsByTagName('ymin')[0].childNodes[0].data)
                 objs_list.append(obj_inf)
         return (img, objs_list)
+    
+    def getPriors(self):
+        #TODO
+        pass
+
+    def setBBox(self):
+        #TODO
+        pass
