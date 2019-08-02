@@ -70,9 +70,9 @@ class VOC_Tool():
     def getGT(self, img_ID, class_name):
         # TODO
         # 不知道xmin...是不是就是dxmin...
-        (img, objs_list) = getImaInf(img_ID, class_name)
+        (img, objs_list) = self.getImaInf(img_ID, class_name)
         gt_list = []
-        oneHot = getOneHot(class_name)
+        oneHot = self.getOneHot(class_name)
         img_height = len(img)
         img_width = len(img[0])
         for obj in objs_list:
@@ -87,7 +87,7 @@ class VOC_Tool():
         return gt_list
     
     
-    def getPriors(self):
+    def setPriors(self):
         #TODO
         pass
 
