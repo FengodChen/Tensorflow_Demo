@@ -34,3 +34,10 @@ results = bb.detection_out(tmp_targets)
 # results[i][:, 4]
 # ymax
 # results[i][:, 5]
+
+# Input is img_resize, Output is bbox.assign_boxes(gt[key])
+
+import main_fit
+voc = main_fit.VOC_Tool('../../Train/VOC2012', ['cat', 'car'], (300, 300, 3))
+voc.initModel()
+voc.fit(1024, 'cat')

@@ -23,8 +23,9 @@ class VOC_Tool():
         self.input_shape = input_shape
         self.classes_num = len(classes_list)
         self.classes_inf_nameprop = {}
-        #self.bbox = BBoxUtility(self.classes_num, pickle.load(open('prior_boxes_ssd300.pkl', 'rb')))
-        self.bbox = None
+        self.bbox = BBoxUtility(self.classes_num + 1, pickle.load(open('prior_boxes_ssd300.pkl', 'rb')))
+        self.model = SSD300(self.input_shape, self.classes_num)
+        #self.bbox = None
 
         for class_name in self.classes_list:
             class_inf_nameprop = {}
@@ -65,16 +66,17 @@ class VOC_Tool():
                 obj_inf['ymax'] = int(obj.getElementsByTagName('ymax')[0].childNodes[0].data)
                 obj_inf['ymin'] = int(obj.getElementsByTagName('ymin')[0].childNodes[0].data)
                 objs_list.append(obj_inf)
-        return (img, objs_list)
+        img_height = len(img)
+        img_width = len(img[0])
+        img_resize = cv2.resize(img, (self.input_shape[1], self.input_shape[0]))
+        return (img_resize, img_height, img_width, objs_list)
     
     def getGT(self, img_ID, class_name):
         # TODO
         # 不知道xmin...是不是就是dxmin...
-        (img, objs_list) = self.getImaInf(img_ID, class_name)
+        (img, img_height, img_width, objs_list) = self.getImaInf(img_ID, class_name)
         gt_list = []
         oneHot = self.getOneHot(class_name)
-        img_height = len(img)
-        img_width = len(img[0])
         for obj in objs_list:
             gt_tmp = []
             gt_tmp.append(obj['xmin']/img_width)
@@ -83,10 +85,50 @@ class VOC_Tool():
             gt_tmp.append(obj['ymax']/img_height)
             for oh in oneHot:
                 gt_tmp.append(oh)
-            gt_list.append(np.array(gt_tmp, dtype=float))
-        return gt_list
+            #gt_list.append(np.array(gt_tmp, dtype=float))
+            gt_list.append(gt_tmp)
+            gt_list_np = np.array(gt_list, dtype=float)
+        return gt_list_np
+    
+    def getRandomList(self, size, class_name):
+        tmp = self.classes_inf_nameprop[class_name]
+        ranList = []
+        for key in tmp:
+            if (tmp[key] == '1'):
+                ranList.append(key)
+        return np.random.choice(ranList, size=size)
+
+    def initModel(self):
+        '''
+        callbacks = [keras.callbacks.ModelCheckpoint('./checkpoints/weights.{epoch:02d}-{val_loss:.2f}.hdf5',
+                                             verbose=1,
+                                             save_weights_only=True),
+             keras.callbacks.LearningRateScheduler(schedule)]
+        '''
+        self.model.compile(optimizer = keras.optimizers.Adam(3e-4),
+                      loss = MultiboxLoss(self.classes_num, neg_pos_ratio=2.0).compute_loss
+                      #metrics=['accuracy']
+                      )
+    def fit(self, size, class_name):
+        self.initModel()
+        fit_list = self.getRandomList(size, class_name)
+        x = []
+        y = []
+        for imgID in fit_list:
+            (x_tmp, tmp1, tmp2, tmp3) = self.getImaInf(imgID, class_name)
+            x.append(x_tmp)
+            y_tmp = self.bbox.assign_boxes(self.getGT(imgID, class_name))
+            y.append(y_tmp)
+        x = np.array(x, dtype=np.float32)
+        y = np.array(y, dtype=np.float32)
+        self.model.fit(x, y,
+                       batch_size = 128,
+                       verbose=1,
+                       epochs=10)
+
     
     
+    '''
     def setPriors(self):
         #TODO
         pass
@@ -94,3 +136,4 @@ class VOC_Tool():
     def setBBox(self):
         #TODO
         pass
+    '''
