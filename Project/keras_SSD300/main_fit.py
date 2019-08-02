@@ -13,7 +13,7 @@ from ssd_utils import BBoxUtility
 from ssd_fit import MultiboxLoss
 from ssd_model import SSD300
 
-class VOC_Generator():
+class VOC_Tool():
     '''
     Classes List not include background class
     '''
@@ -37,7 +37,20 @@ class VOC_Generator():
             
             self.classes_inf_nameprop[class_name] = class_inf_nameprop
     
-    def getImaAndGT(self, img_ID, obj_Name):
+    def getOneHot(self, class_name):
+        oneHot = np.zeros(shape=(self.classes_num), dtype=float)
+        for ptr in range(self.classes_num):
+            if (self.classes_list[ptr] == class_name):
+                oneHot[ptr] = 1
+                break
+        return oneHot
+    
+    def decodeOneHot(self, oneHot):
+        ptr = np.argmax(oneHot)
+        return self.classes_list[ptr]
+
+    
+    def getImaInf(self, img_ID, class_name):
         objs_list = []
         img_path = self.voc_path + '/JPEGImages/' + img_ID + '.jpg'
         img_xml = self.voc_path + '/Annotations/' + img_ID + '.xml'
@@ -45,7 +58,7 @@ class VOC_Generator():
         inf = minidom.parse(img_xml).documentElement
         objs = inf.getElementsByTagName('object')
         for obj in objs:
-            if (obj.getElementsByTagName('name')[0].childNodes[0].data == obj_Name):
+            if (obj.getElementsByTagName('name')[0].childNodes[0].data == class_name):
                 obj_inf = {}
                 obj_inf['xmax'] = int(obj.getElementsByTagName('xmax')[0].childNodes[0].data)
                 obj_inf['xmin'] = int(obj.getElementsByTagName('xmin')[0].childNodes[0].data)
@@ -53,6 +66,22 @@ class VOC_Generator():
                 obj_inf['ymin'] = int(obj.getElementsByTagName('ymin')[0].childNodes[0].data)
                 objs_list.append(obj_inf)
         return (img, objs_list)
+    
+    def getGT(self, img_ID, class_name):
+        (img, objs_list) = getImaInf(img_ID, class_name)
+        gt_list = []
+        oneHot = getOneHot(class_name)
+        for obj in objs_list:
+            gt_tmp = []
+            gt_tmp.append(obj['xmin'])
+            gt_tmp.append(obj['ymin'])
+            gt_tmp.append(obj['xmax'])
+            gt_tmp.append(obj['ymax'])
+            for oh in oneHot:
+                gt_tmp.append(oh)
+            gt_list.append(np.array(gt_tmp, dtype=float))
+        return gt_list
+    
     
     def getPriors(self):
         #TODO

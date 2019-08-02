@@ -9,6 +9,8 @@ p = pickle.load(open('prior_boxes_ssd300.pkl', 'rb'))
 # gt[key].shape = (x, 7)
 # x means box number
 # 7 means classes_number + 4, classes number not include background number
+# (+4) means dxmin, dymin, dxmax, dymax
+# So gt = [dxmin, dymin, dxmax, dymax, (classes one-hot array)]
 gt = pickle.load(open('gt_pascal.pkl', 'rb'))
 y = gt['frame04467.png'].copy()
 # Class number = 4, include background class
