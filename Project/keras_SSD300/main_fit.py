@@ -68,15 +68,19 @@ class VOC_Tool():
         return (img, objs_list)
     
     def getGT(self, img_ID, class_name):
+        # TODO
+        # 不知道xmin...是不是就是dxmin...
         (img, objs_list) = getImaInf(img_ID, class_name)
         gt_list = []
         oneHot = getOneHot(class_name)
+        img_height = len(img)
+        img_width = len(img[0])
         for obj in objs_list:
             gt_tmp = []
-            gt_tmp.append(obj['xmin'])
-            gt_tmp.append(obj['ymin'])
-            gt_tmp.append(obj['xmax'])
-            gt_tmp.append(obj['ymax'])
+            gt_tmp.append(obj['xmin']/img_width)
+            gt_tmp.append(obj['ymin']/img_height)
+            gt_tmp.append(obj['xmax']/img_width)
+            gt_tmp.append(obj['ymax']/img_height)
             for oh in oneHot:
                 gt_tmp.append(oh)
             gt_list.append(np.array(gt_tmp, dtype=float))
