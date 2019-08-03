@@ -26,7 +26,9 @@ class Normalize(keras.Model):
         super(Normalize, self).__init__(**kwargs)
 
     def build(self, input_shape):
-        #TODO
+        #TODO!!!
+        #TODO!!!
+        #TODO!!!
         #self.input_spec = [InputSpec(shape=input_shape)]
         #print(self.input_spec)
         shape = (input_shape[self.axis],)
