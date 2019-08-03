@@ -5,6 +5,8 @@ import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 
+#from keras.applications.keras_applications.imagenet_utils import preprocess_input
+from keras import applications
 from tensorflow import keras
 from random import shuffle
 from xml.dom import minidom
@@ -68,6 +70,7 @@ class VOC_Tool():
                 objs_list.append(obj_inf)
         img_height = len(img)
         img_width = len(img[0])
+        # TODO
         img_resize = cv2.resize(img, (self.input_shape[1], self.input_shape[0]))
         return (img_resize, img_height, img_width, objs_list)
     
@@ -105,7 +108,9 @@ class VOC_Tool():
                                              save_weights_only=True),
              keras.callbacks.LearningRateScheduler(schedule)]
         '''
-        self.model.compile(optimizer = keras.optimizers.Adam(3e-4),
+        # TODO
+        # Debug?
+        self.model.compile(optimizer = keras.optimizers.Adam(),
                       loss = MultiboxLoss(self.classes_num, neg_pos_ratio=2.0).compute_loss
                       #metrics=['accuracy']
                       )
@@ -120,6 +125,7 @@ class VOC_Tool():
             y_tmp = self.bbox.assign_boxes(self.getGT(imgID, class_name))
             y.append(y_tmp)
         x = np.array(x, dtype=np.float32)
+        x = applications.keras_applications.imagenet_utils.preprocess_input(x, data_format='channels_last')
         y = np.array(y, dtype=np.float32)
         self.model.fit(x, y,
                        batch_size = 128,

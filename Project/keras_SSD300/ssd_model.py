@@ -134,6 +134,7 @@ def SSD300(input_shape, classes_num):
     # TODO
     # Debug else
     else:
+        #num_boxes = net['mbox_loc']._keras_shape[-1] // 4
         num_boxes = keras.backend.int_shape(net['mbox_loc'])[-1] // 4
     #print(num_boxes)
     net['mbox_loc'] = keras.layers.Reshape((num_boxes, 4),

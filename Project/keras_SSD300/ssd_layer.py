@@ -26,7 +26,9 @@ class Normalize(keras.Model):
         super(Normalize, self).__init__(**kwargs)
 
     def build(self, input_shape):
+        #TODO
         #self.input_spec = [InputSpec(shape=input_shape)]
+        #print(self.input_spec)
         shape = (input_shape[self.axis],)
         init_gamma = self.scale * np.ones(shape)
         self.gamma = K.variable(init_gamma, name='{}_gamma'.format(self.name))
