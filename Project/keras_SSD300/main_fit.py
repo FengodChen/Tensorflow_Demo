@@ -19,8 +19,10 @@ class VOC_Tool():
     '''
     Classes List not include background class
     '''
-    def __init__(self, voc_path, classes_list, input_shape):
+    def __init__(self, voc_path, classes_list, input_shape, checkpoint_path='./model_save/checkpoint/', save_path='./model_save/save/'):
         self.voc_path = voc_path
+        self.checkpoint_path = checkpoint_path
+        self.save_path = save_path
         self.classes_list = classes_list
         self.input_shape = input_shape
         self.classes_num = len(classes_list)
@@ -29,7 +31,6 @@ class VOC_Tool():
         #self.bbox = BBoxUtility(self.classes_num + 1, pickle.load(open('prior_boxes_ssd300.pkl', 'rb')))
         prior = pickle.load(open('prior_boxes_ssd300.pkl', 'rb'))
         prior = prior[:6537, :]
-        #self.bbox = BBoxUtility(self.classes_num + 1, prior)
         self.bbox = BBoxUtility(self.classes_num + 1, prior)
         # </TODO>
         self.model = SSD300(self.input_shape, self.classes_num + 1)
@@ -108,8 +109,21 @@ class VOC_Tool():
                 ranList.append(key)
         return np.random.choice(ranList, size=size)
 
+    def loadCheckpoint(self, file_name, load_path = None):
+        if (load_path != None):
+            self.checkpoint_path = load_path
+        file_path = self.checkpoint_path + file_name
+        self.model.load_weights(file_path)
+
+    def loadSave(self, file_name, load_path = None):
+        if (load_path != None):
+            self.save_path = load_path
+        file_path = self.save_path + file_name
+        self.model.load_weights(file_path)
+
     def initModel(self):
-        self.callbacks = [keras.callbacks.ModelCheckpoint('./model_save/checkpoint/save.h5',
+        checkfile_name = 'save.h5'
+        self.callbacks = [keras.callbacks.ModelCheckpoint(self.checkpoint_path + checkfile_name,
                                              verbose=1,
                                              save_weights_only=True)]
         self.model.compile(optimizer = keras.optimizers.Adam(3e-4),
