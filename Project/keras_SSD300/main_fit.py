@@ -25,7 +25,13 @@ class VOC_Tool():
         self.input_shape = input_shape
         self.classes_num = len(classes_list)
         self.classes_inf_nameprop = {}
-        self.bbox = BBoxUtility(self.classes_num + 1, pickle.load(open('prior_boxes_ssd300.pkl', 'rb')))
+        # <TODO>
+        #self.bbox = BBoxUtility(self.classes_num + 1, pickle.load(open('prior_boxes_ssd300.pkl', 'rb')))
+        prior = pickle.load(open('prior_boxes_ssd300.pkl', 'rb'))
+        prior = prior[:6537, :]
+        #self.bbox = BBoxUtility(self.classes_num + 1, prior)
+        self.bbox = BBoxUtility(self.classes_num + 1, prior)
+        # </TODO>
         self.model = SSD300(self.input_shape, self.classes_num)
         #self.bbox = None
 
@@ -108,12 +114,17 @@ class VOC_Tool():
                                              save_weights_only=True),
              keras.callbacks.LearningRateScheduler(schedule)]
         '''
-        # TODO
-        # Debug?
-        self.model.compile(optimizer = keras.optimizers.Adam(),
+        # <TODO todo=Debug>
+        # <BUG>MultiboxLoss</BUG>
+        # <BUGInfo>
+        #   tensorflow.python.framework.errors_impl.InvalidArgumentError: Incompatible shapes: [32,6537,3] vs. [32,6537,2]
+        #   [[{{node Adam_1/gradients/loss_1/predictions_loss/mul_grad/BroadcastGradientArgs}}]]
+        # </BUGInfo>
+        self.model.compile(optimizer = keras.optimizers.Adam(3e-4),
                       loss = MultiboxLoss(self.classes_num, neg_pos_ratio=2.0).compute_loss
                       #metrics=['accuracy']
                       )
+        # </TODO>
     def fit(self, size, class_name):
         self.initModel()
         fit_list = self.getRandomList(size, class_name)

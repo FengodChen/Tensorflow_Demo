@@ -74,8 +74,6 @@ class MultiboxLoss(object):
             loss: Loss for prediction, tensor of shape (?,).
         """
         batch_size = tf.shape(y_true)[0]
-        # TODO
-        #num_boxes = tf.to_float(tf.shape(y_true)[1])
         num_boxes = tf.cast(tf.shape(y_true)[1], tf.float32)
 
         # loss for all priors
@@ -101,8 +99,6 @@ class MultiboxLoss(object):
                                 [(1 - has_min) * self.negatives_for_hard]])
         num_neg_batch = tf.reduce_min(tf.boolean_mask(num_neg,
                                                       tf.greater(num_neg, 0)))
-        # TODO
-        #num_neg_batch = tf.to_int32(num_neg_batch)
         num_neg_batch = tf.cast(num_neg_batch, tf.int32)
         confs_start = 4 + self.background_label_id + 1
         confs_end = confs_start + self.num_classes - 1
