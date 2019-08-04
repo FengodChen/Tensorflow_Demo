@@ -42,4 +42,4 @@ results = bb.detection_out(tmp_targets)
 import main_fit
 voc = main_fit.VOC_Tool('../../Train/VOC2012', ['cat', 'car'], (300, 300, 3))
 voc.initModel()
-voc.fit(1024, 'cat')
+voc.fit(8, 'cat')
