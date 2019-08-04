@@ -32,7 +32,8 @@ class VOC_Tool():
         #self.bbox = BBoxUtility(self.classes_num + 1, prior)
         self.bbox = BBoxUtility(self.classes_num + 1, prior)
         # </TODO>
-        self.model = SSD300(self.input_shape, self.classes_num)
+        self.model = SSD300(self.input_shape, self.classes_num + 1)
+        #self.model = SSD300(self.input_shape, self.classes_num)
         #self.bbox = None
 
         for class_name in self.classes_list:
@@ -114,17 +115,10 @@ class VOC_Tool():
                                              save_weights_only=True),
              keras.callbacks.LearningRateScheduler(schedule)]
         '''
-        # <TODO todo=Debug>
-        # <BUG>MultiboxLoss</BUG>
-        # <BUGInfo>
-        #   tensorflow.python.framework.errors_impl.InvalidArgumentError: Incompatible shapes: [32,6537,3] vs. [32,6537,2]
-        #   [[{{node Adam_1/gradients/loss_1/predictions_loss/mul_grad/BroadcastGradientArgs}}]]
-        # </BUGInfo>
         self.model.compile(optimizer = keras.optimizers.Adam(3e-4),
                       loss = MultiboxLoss(self.classes_num, neg_pos_ratio=2.0).compute_loss
                       #metrics=['accuracy']
                       )
-        # </TODO>
     def fit(self, size, class_name):
         self.initModel()
         fit_list = self.getRandomList(size, class_name)
@@ -142,7 +136,7 @@ class VOC_Tool():
         keras.backend.get_session().run(tf.global_variables_initializer())
 
         self.model.fit(x, y,
-                       batch_size = 128,
+                       batch_size = 1,
                        verbose=1,
                        epochs=10)
 
