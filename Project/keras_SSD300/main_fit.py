@@ -127,6 +127,9 @@ class VOC_Tool():
         x = np.array(x, dtype=np.float32)
         x = applications.keras_applications.imagenet_utils.preprocess_input(x, data_format='channels_last')
         y = np.array(y, dtype=np.float32)
+
+        keras.backend.get_session().run(tf.global_variables_initializer())
+
         self.model.fit(x, y,
                        batch_size = 128,
                        verbose=1,
