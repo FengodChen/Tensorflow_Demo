@@ -109,17 +109,14 @@ class VOC_Tool():
         return np.random.choice(ranList, size=size)
 
     def initModel(self):
-        '''
-        callbacks = [keras.callbacks.ModelCheckpoint('./checkpoints/weights.{epoch:02d}-{val_loss:.2f}.hdf5',
+        self.callbacks = [keras.callbacks.ModelCheckpoint('./model_save/checkpoint/save.h5',
                                              verbose=1,
-                                             save_weights_only=True),
-             keras.callbacks.LearningRateScheduler(schedule)]
-        '''
+                                             save_weights_only=True)]
         self.model.compile(optimizer = keras.optimizers.Adam(3e-4),
                       loss = MultiboxLoss(self.classes_num, neg_pos_ratio=2.0).compute_loss
                       #metrics=['accuracy']
                       )
-    def fit(self, size, class_name):
+    def fit(self, size, class_name, batch_size=8, epochs=10):
         self.initModel()
         fit_list = self.getRandomList(size, class_name)
         x = []
@@ -136,9 +133,10 @@ class VOC_Tool():
         keras.backend.get_session().run(tf.global_variables_initializer())
 
         self.model.fit(x, y,
-                       batch_size = 1,
+                       batch_size = batch_size,
                        verbose=1,
-                       epochs=10)
+                       epochs=epochs,
+                       callbacks=self.callbacks)
 
     
     

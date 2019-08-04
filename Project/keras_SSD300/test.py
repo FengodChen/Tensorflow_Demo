@@ -43,4 +43,4 @@ import main_fit
 #voc = main_fit.VOC_Tool('../../Train/VOC2012', ['cat', 'car', 'dog', 'person'], (300, 300, 3))
 voc = main_fit.VOC_Tool('../../Train/VOC2012', ['cat', 'car'], (300, 300, 3))
 voc.initModel()
-voc.fit(32, 'cat')
+voc.fit(1024, 'car')
