@@ -5,7 +5,10 @@ from tensorflow import keras
 import numpy as np
 import tensorflow as tf
 
-
+# TODO
+# ERROR WHEN USING:
+# Tensor conversion requested dtype float32_ref for Tensor with dtype float32:
+# 'Tensor("Adam_1/conv4_3_norm/conv4_3_norm_gamma/m/Initializer/zeros:0", shape=(512,), dtype=float32)'
 class Normalize(keras.Model):
     """Normalization layer as described in ParseNet paper.
     # Arguments
@@ -26,9 +29,6 @@ class Normalize(keras.Model):
         super(Normalize, self).__init__(**kwargs)
 
     def build(self, input_shape):
-        #TODO!!!
-        #TODO!!!
-        #TODO!!!
         #self.input_spec = [InputSpec(shape=input_shape)]
         #print(self.input_spec)
         shape = (input_shape[self.axis],)

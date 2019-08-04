@@ -54,7 +54,9 @@ def SSD300(input_shape, classes_num):
     # Prediction from conv4_3
     priors_num = 3
     name = 'conv4_3_norm_mbox_conf' + '_{}'.format(classes_num)
+    # TODO
     net['conv4_3_norm'] = ssd_layer.Normalize(20, name='conv4_3_norm')(net['conv4_3'])
+    #net['conv4_3_norm'] = keras.layers.Dropout(0.9, name='conv4_3_norm')(net['conv4_3'])
     net['conv4_3_norm_mbox_loc'] = keras.layers.Conv2D(priors_num*4, (3, 3), padding='same', name='conv4_3_norm_mbox_loc')(net['conv4_3_norm'])
     net['conv4_3_norm_mbox_loc_flat'] = keras.layers.Flatten(name='conv4_3_norm_mbox_loc_flat')(net['conv4_3_norm_mbox_loc'])
     net['conv4_3_norm_mbox_conf'] = keras.layers.Conv2D(priors_num*classes_num, (3, 3), padding='same',name=name)(net['conv4_3_norm'])
