@@ -49,6 +49,7 @@ class VOC_Tool():
             self.classes_inf_nameprop[class_name] = class_inf_nameprop
     
     def getOneHot(self, class_name):
+        isBack = True
         oneHot = np.zeros(shape=(self.classes_num), dtype=float)
         for ptr in range(self.classes_num):
             if (self.classes_list[ptr] == class_name):
@@ -87,6 +88,7 @@ class VOC_Tool():
         # 不知道xmin...是不是就是dxmin...
         (img, img_height, img_width, objs_list) = self.getImaInf(img_ID, class_name)
         gt_list = []
+        gt_list_np = None
         oneHot = self.getOneHot(class_name)
         for obj in objs_list:
             gt_tmp = []
@@ -94,9 +96,10 @@ class VOC_Tool():
             gt_tmp.append(obj['ymin']/img_height)
             gt_tmp.append(obj['xmax']/img_width)
             gt_tmp.append(obj['ymax']/img_height)
+            # <TODO todo=Debug>
             for oh in oneHot:
+            # </TODO>
                 gt_tmp.append(oh)
-            #gt_list.append(np.array(gt_tmp, dtype=float))
             gt_list.append(gt_tmp)
             gt_list_np = np.array(gt_list, dtype=float)
         return gt_list_np
@@ -140,6 +143,29 @@ class VOC_Tool():
             x.append(x_tmp)
             y_tmp = self.bbox.assign_boxes(self.getGT(imgID, class_name))
             y.append(y_tmp)
+        x = np.array(x, dtype=np.float32)
+        x = applications.keras_applications.imagenet_utils.preprocess_input(x, data_format='channels_last')
+        y = np.array(y, dtype=np.float32)
+
+        keras.backend.get_session().run(tf.global_variables_initializer())
+
+        self.model.fit(x, y,
+                       batch_size = batch_size,
+                       verbose=1,
+                       epochs=epochs,
+                       callbacks=self.callbacks)
+    def fit_single(self, class_name, imgID, batch_size=1, epochs=100):
+        '''
+        # Debug Function
+        This function is used to checkout if the net work
+        '''
+        self.initModel()
+        x = []
+        y = []
+        (x_tmp, tmp1, tmp2, tmp3) = self.getImaInf(imgID, class_name)
+        x.append(x_tmp)
+        y_tmp = self.bbox.assign_boxes(self.getGT(imgID, class_name))
+        y.append(y_tmp)
         x = np.array(x, dtype=np.float32)
         x = applications.keras_applications.imagenet_utils.preprocess_input(x, data_format='channels_last')
         y = np.array(y, dtype=np.float32)
