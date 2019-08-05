@@ -151,15 +151,15 @@ class VOC_Tool():
                        verbose=1,
                        epochs=epochs,
                        callbacks=self.callbacks)
-
     
-    
-    '''
-    def setPriors(self):
-        #TODO
-        pass
+    def predict(self, img_path):
+        img_list = []
+        img = cv2.imread(img_path)
+        img = cv2.resize(img, (self.input_shape[1], self.input_shape[0]))
+        img_list.append(img)
+        img_list = np.array(img_list, dtype=np.float32)
+        img_list = applications.keras_applications.imagenet_utils.preprocess_input(img_list, data_format='channels_last')
 
-    def setBBox(self):
-        #TODO
-        pass
-    '''
+        keras.backend.get_session().run(tf.global_variables_initializer())
+        ans = self.model.predict(img_list)
+        return ans

@@ -39,9 +39,18 @@ results = bb.detection_out(tmp_targets)
 
 # Input is img_resize, Output is bbox.assign_boxes(gt[key])
 '''
+
+'''
 import main_fit
 #voc = main_fit.VOC_Tool('../../Train/VOC2012', ['cat', 'car', 'dog', 'person'], (300, 300, 3))
 voc = main_fit.VOC_Tool('../../Train/VOC2012', ['car'], (300, 300, 3))
 #voc.loadCheckpoint('save.h5')
 voc.initModel()
 voc.fit(1024, 'car')
+'''
+
+from main_fit import VOC_Tool
+voc = VOC_Tool('../../Train/VOC2012', ['car'], (300, 300, 3))
+voc.loadCheckpoint('save.h5')
+voc.initModel()
+ans = voc.predict('image/test.jpg')
