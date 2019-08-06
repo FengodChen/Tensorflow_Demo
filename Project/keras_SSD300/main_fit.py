@@ -34,8 +34,6 @@ class VOC_Tool():
         self.bbox = BBoxUtility(self.classes_num + 1, prior)
         # </TODO>
         self.model = SSD300(self.input_shape, self.classes_num + 1)
-        #self.model = SSD300(self.input_shape, self.classes_num)
-        #self.bbox = None
 
         for class_name in self.classes_list:
             class_inf_nameprop = {}
@@ -124,14 +122,18 @@ class VOC_Tool():
         file_path = self.save_path + file_name
         self.model.load_weights(file_path)
 
-    def initModel(self):
+    def initModel(self, checkout=False):
         checkfile_name = 'save.h5'
-        self.callbacks = [keras.callbacks.ModelCheckpoint(self.checkpoint_path + checkfile_name,
-                                             verbose=1,
-                                             save_weights_only=True)]
+        if (checkout):
+            self.callbacks = [keras.callbacks.ModelCheckpoint(self.checkpoint_path + checkfile_name,
+                                                              verbose=1,
+                                                              save_weights_only=True)]
+        else:
+            self.callbacks = None
+
         self.model.compile(optimizer = keras.optimizers.Adam(3e-4),
-                      loss = MultiboxLoss(self.classes_num, neg_pos_ratio=2.0).compute_loss
-                      #metrics=['accuracy']
+                      loss = MultiboxLoss(self.classes_num, neg_pos_ratio=2.0).compute_loss,
+                      metrics=['accuracy']
                       )
     def fit(self, size, class_name, batch_size=8, epochs=10):
         self.initModel()
@@ -176,7 +178,8 @@ class VOC_Tool():
                        batch_size = batch_size,
                        verbose=1,
                        epochs=epochs,
-                       callbacks=self.callbacks)
+                       callbacks=self.callbacks
+                       )
     
     def predict(self, img_path):
         img_list = []

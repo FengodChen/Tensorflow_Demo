@@ -56,8 +56,6 @@ def SSD300(input_shape, classes_num):
     name = 'conv4_3_norm_mbox_conf' + '_{}'.format(classes_num)
     # TODO
     net['conv4_3_norm'] = keras.layers.LayerNormalization(name='conv4_3_norm')(net['conv4_3'])
-    #net['conv4_3_norm'] = ssd_layer.Normalize(20, name='conv4_3_norm')(net['conv4_3'])
-    #net['conv4_3_norm'] = keras.layers.Dropout(0.9, name='conv4_3_norm')(net['conv4_3'])
     net['conv4_3_norm_mbox_loc'] = keras.layers.Conv2D(priors_num*4, (3, 3), padding='same', name='conv4_3_norm_mbox_loc')(net['conv4_3_norm'])
     net['conv4_3_norm_mbox_loc_flat'] = keras.layers.Flatten(name='conv4_3_norm_mbox_loc_flat')(net['conv4_3_norm_mbox_loc'])
     net['conv4_3_norm_mbox_conf'] = keras.layers.Conv2D(priors_num*classes_num, (3, 3), padding='same',name=name)(net['conv4_3_norm'])
@@ -130,16 +128,8 @@ def SSD300(input_shape, classes_num):
                                   net['conv8_2_mbox_priorbox'],
                                   net['pool6_mbox_priorbox']],
                                  axis=1, name='mbox_priorbox')
-    if hasattr(net['mbox_loc'], '_keras_shape'):
-        num_boxes = net['mbox_loc']._keras_shape[-1] // 4
-    elif hasattr(net['mbox_loc'], 'int_shape'):
-        num_boxes = keras.backend.int_shape(net['mbox_loc'])[-1] // 4
-    # TODO
-    # Debug else
-    else:
-        #num_boxes = net['mbox_loc']._keras_shape[-1] // 4
-        num_boxes = keras.backend.int_shape(net['mbox_loc'])[-1] // 4
-    #print(num_boxes)
+    num_boxes = keras.backend.int_shape(net['mbox_loc'])[-1] // 4
+
     net['mbox_loc'] = keras.layers.Reshape((num_boxes, 4),
                               name='mbox_loc_final')(net['mbox_loc'])
     net['mbox_conf'] = keras.layers.Reshape((num_boxes, classes_num),
@@ -152,8 +142,8 @@ def SSD300(input_shape, classes_num):
                                axis=2, name='predictions')
     model = keras.models.Model(net['input'], net['predictions'])
     # Freezen VGG16 weight
-    for vgg in model.layers[:19]:
+    #for vgg in model.layers[:19]:
+    for vgg in model.layers[:11]:
         vgg.trainable = False
-    #model.summary()
+
     return model
-    # return (vgg16_model, model)
