@@ -122,15 +122,16 @@ class VOC_Tool():
         file_path = self.save_path + file_name
         self.model.load_weights(file_path)
 
-    def initModel(self, checkout=False):
+    def initModel(self):
         checkfile_name = 'save.h5'
-        if (checkout):
-            self.callbacks = [keras.callbacks.ModelCheckpoint(self.checkpoint_path + checkfile_name,
-                                                              verbose=1,
-                                                              save_weights_only=True)]
-        else:
-            self.callbacks = None
-
+        self.callbacks = [keras.callbacks.ModelCheckpoint(self.checkpoint_path + checkfile_name,
+                                                          verbose=1,
+                                                          save_weights_only=True,
+                                                          #save_best_only=True,
+                                                          #monitor='val_loss',
+                                                          save_freq=5,
+                                                          load_weights_on_restart=True
+                                                          )]
         self.model.compile(optimizer = keras.optimizers.Adam(3e-4),
                       loss = MultiboxLoss(self.classes_num, neg_pos_ratio=2.0).compute_loss,
                       metrics=['accuracy']
@@ -173,7 +174,7 @@ class VOC_Tool():
         x = applications.keras_applications.imagenet_utils.preprocess_input(x, data_format='channels_last')
         y = np.array(y, dtype=np.float32)
 
-        keras.backend.get_session().run(tf.global_variables_initializer())
+        tf.compat.v1.keras.backend.get_session().run(tf.compat.v1.global_variables_initializer())
 
         self.model.fit(x, y,
                        batch_size = batch_size,
@@ -190,6 +191,7 @@ class VOC_Tool():
         img_list = np.array(img_list, dtype=np.float32)
         img_list = applications.keras_applications.imagenet_utils.preprocess_input(img_list, data_format='channels_last')
 
-        keras.backend.get_session().run(tf.global_variables_initializer())
+        #keras.backend.get_session().run(tf.global_variables_initializer())
+        tf.compat.v1.keras.backend.get_session().run(tf.compat.v1.global_variables_initializer())
         ans = self.model.predict(img_list)
         return ans

@@ -2,6 +2,9 @@
 
 from main_fit import VOC_Tool
 import tensorflow as tf
+import os
+
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '0'  # or any {'0', '2', '3'}
 
 def train():
     while (True):
@@ -19,11 +22,12 @@ def predict():
 def debugTrain():
     classes_list = ['car', 'cat']
     voc = VOC_Tool('../../Train/VOC2012', classes_list, (300, 300, 3))
-    voc.initModel(checkout=True)
-    voc.fit_single(classes_list[0], '2007_003051')
+    #voc.initModel(False)
+    voc.initModel()
     #voc.model.load_model()
-    #voc.model.save('save.h5')
-    #tf.keras.models.save_model(voc.model, 'model_save/checkpoint/save.h5')
+    voc.model.load_weights('./model_save/checkpoint/save.h5')
+    voc.fit_single(classes_list[0], '2007_003051', epochs=100, size=1)
+    #voc.model.save_weights('./model_save/save/save.h5')
     '''
     while (True):
         voc.loadCheckpoint('save.h5')
