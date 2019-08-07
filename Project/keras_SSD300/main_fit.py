@@ -156,7 +156,7 @@ class VOC_Tool():
                        verbose=1,
                        epochs=epochs,
                        callbacks=self.callbacks)
-    def fit_single(self, class_name, imgID, batch_size=1, epochs=100):
+    def fit_single(self, class_name, imgID, size=128, batch_size=16, epochs=10):
         '''
         # Debug Function
         This function is used to checkout if the net work
@@ -165,9 +165,10 @@ class VOC_Tool():
         x = []
         y = []
         (x_tmp, tmp1, tmp2, tmp3) = self.getImaInf(imgID, class_name)
-        x.append(x_tmp)
         y_tmp = self.bbox.assign_boxes(self.getGT(imgID, class_name))
-        y.append(y_tmp)
+        for i in range(size):
+            x.append(x_tmp)
+            y.append(y_tmp)
         x = np.array(x, dtype=np.float32)
         x = applications.keras_applications.imagenet_utils.preprocess_input(x, data_format='channels_last')
         y = np.array(y, dtype=np.float32)
