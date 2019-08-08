@@ -19,7 +19,8 @@ class VOC_Tool():
     '''
     Classes List not include background class
     '''
-    def __init__(self, voc_path, classes_list, input_shape, checkpoint_path='./model_save/checkpoint/', save_path='./model_save/save/'):
+    def __init__(self, voc_path, classes_list, input_shape, checkpoint_path='./model_save/checkpoint/', save_path='./model_save/save/',
+                 do_crop=True, crop_area_range=[0.75, 1.0], aspect_ratio_range=[3./4, 4./3]):
         self.voc_path = voc_path
         self.checkpoint_path = checkpoint_path
         self.save_path = save_path
@@ -34,6 +35,9 @@ class VOC_Tool():
         self.bbox = BBoxUtility(self.classes_num + 1, prior)
         # </TODO>
         self.model = SSD300(self.input_shape, self.classes_num + 1)
+        self.do_crop = do_crop
+        self.crop_area_range = crop_area_range
+        self.aspect_ratio_range = aspect_ratio_range
 
         for class_name in self.classes_list:
             class_inf_nameprop = {}
@@ -60,7 +64,7 @@ class VOC_Tool():
         return self.classes_list[ptr]
 
     
-    def getImaInf(self, img_ID, class_name):
+    def getImage(self, img_ID, class_name):
         objs_list = []
         img_path = self.voc_path + '/JPEGImages/' + img_ID + '.jpg'
         img_xml = self.voc_path + '/Annotations/' + img_ID + '.xml'
@@ -78,31 +82,89 @@ class VOC_Tool():
         img_height = len(img)
         img_width = len(img[0])
         # TODO
+        #img_resize = cv2.resize(img, (self.input_shape[1], self.input_shape[0]))
+        img = img[..., ::-1]
+        #img_resize = img_resize.astype(np.float32) / 255.0
+        return (img, img_height, img_width, objs_list)
+
+    def resizeImg(self, img):
         img_resize = cv2.resize(img, (self.input_shape[1], self.input_shape[0]))
-        img_resize = img_resize[..., ::-1]
         img_resize = img_resize.astype(np.float32) / 255.0
-        return (img_resize, img_height, img_width, objs_list)
-    
+        return img_resize
+
     def getGT(self, img_ID, class_name):
         # TODO
         # 不知道xmin...是不是就是dxmin...
-        (img, img_height, img_width, objs_list) = self.getImaInf(img_ID, class_name)
+        (img, img_height, img_width, objs_list) = self.getImage(img_ID, class_name)
         gt_list = []
         gt_list_np = None
         oneHot = self.getOneHot(class_name)
         for obj in objs_list:
             gt_tmp = []
+            '''
             gt_tmp.append(obj['xmin']/img_width)
             gt_tmp.append(obj['ymin']/img_height)
             gt_tmp.append(obj['xmax']/img_width)
             gt_tmp.append(obj['ymax']/img_height)
-            # <TODO todo=Debug>
+            '''
+            gt_tmp.append(obj['xmin'])
+            gt_tmp.append(obj['ymin'])
+            gt_tmp.append(obj['xmax'])
+            gt_tmp.append(obj['ymax'])
             for oh in oneHot:
-            # </TODO>
                 gt_tmp.append(oh)
             gt_list.append(gt_tmp)
             gt_list_np = np.array(gt_list, dtype=float)
         return gt_list_np
+
+    def random_sized_crop(self, img, targets):
+        img_w = img.shape[1]
+        img_h = img.shape[0]
+        img_area = img_w * img_h
+        random_scale = np.random.random()
+        random_scale *= (self.crop_area_range[1] -
+                         self.crop_area_range[0])
+        random_scale += self.crop_area_range[0]
+        target_area = random_scale * img_area
+        random_ratio = np.random.random()
+        random_ratio *= (self.aspect_ratio_range[1] -
+                         self.aspect_ratio_range[0])
+        random_ratio += self.aspect_ratio_range[0]
+        w = np.round(np.sqrt(target_area * random_ratio))     
+        h = np.round(np.sqrt(target_area / random_ratio))
+        if np.random.random() < 0.5:
+            w, h = h, w
+        w = min(w, img_w)
+        w_rel = w / img_w
+        w = int(w)
+        h = min(h, img_h)
+        h_rel = h / img_h
+        h = int(h)
+        x = np.random.random() * (img_w - w)
+        x_rel = x / img_w
+        x = int(x)
+        y = np.random.random() * (img_h - h)
+        y_rel = y / img_h
+        y = int(y)
+        img = img[y:y+h, x:x+w]
+        new_targets = []
+        for box in targets:
+            cx = 0.5 * (box[0] + box[2])
+            cy = 0.5 * (box[1] + box[3])
+            if (x_rel < cx < x_rel + w_rel and
+                y_rel < cy < y_rel + h_rel):
+                xmin = (box[0] - x_rel) / w_rel
+                ymin = (box[1] - y_rel) / h_rel
+                xmax = (box[2] - x_rel) / w_rel
+                ymax = (box[3] - y_rel) / h_rel
+                xmin = max(0, xmin)
+                ymin = max(0, ymin)
+                xmax = min(1, xmax)
+                ymax = min(1, ymax)
+                box[:4] = [xmin, ymin, xmax, ymax]
+                new_targets.append(box)
+        new_targets = np.asarray(new_targets).reshape(-1, targets.shape[1])
+        return (img, new_targets)
     
     def getRandomList(self, size, class_name):
         tmp = self.classes_inf_nameprop[class_name]
@@ -144,7 +206,7 @@ class VOC_Tool():
         x = []
         y = []
         for imgID in fit_list:
-            (x_tmp, tmp1, tmp2, tmp3) = self.getImaInf(imgID, class_name)
+            (x_tmp, tmp1, tmp2, tmp3) = self.getImage(imgID, class_name)
             x.append(x_tmp)
             y_tmp = self.bbox.assign_boxes(self.getGT(imgID, class_name))
             y.append(y_tmp)
@@ -167,8 +229,11 @@ class VOC_Tool():
         self.initModel()
         x = []
         y = []
-        (x_tmp, tmp1, tmp2, tmp3) = self.getImaInf(imgID, class_name)
-        y_tmp = self.bbox.assign_boxes(self.getGT(imgID, class_name))
+        (x_tmp, tmp1, tmp2, tmp3) = self.getImage(imgID, class_name)
+        gt = self.getGT(imgID, class_name)
+        (x_tmp, gt) = self.random_sized_crop(x_tmp, gt)
+        x_tmp = self.resizeImg(x_tmp)
+        y_tmp = self.bbox.assign_boxes(gt)
         for i in range(size):
             x.append(x_tmp)
             y.append(y_tmp)
