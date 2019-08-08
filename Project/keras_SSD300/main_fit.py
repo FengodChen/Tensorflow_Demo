@@ -259,7 +259,7 @@ class VOC_Tool():
         img_list = []
         img = cv2.imread(img_path).astype(np.float32)
         img = img[..., ::-1]
-        img = self.random_sized_crop(img, None)
+        #img = self.random_sized_crop(img, None)
         img = self.resizeImg(img)
         #img = cv2.resize(img, (self.input_shape[1], self.input_shape[0]))
         img_list.append(img)
