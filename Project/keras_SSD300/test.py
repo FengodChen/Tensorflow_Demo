@@ -54,18 +54,40 @@ import cv2
 import numpy as np
 import os
 import matplotlib.pyplot as plt
+from keras.preprocessing import image as imp
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '0'  # or any {'0', '2', '3'}
 image = []
-img = cv2.imread('image/2007_003051.jpg')
-img = cv2.resize(img, (300, 300))
-img = img[...,::-1]
+
+x_tmp = cv2.imread('image/2007_003051.jpg')
+#x_tmp = cv2.resize(x_tmp, (300, 300))
+x_tmp = x_tmp[...,::-1]
+x_tmp = x_tmp.astype(np.float32)
+
+img = imp.load_img('image/2007_003051.jpg', (300, 300))
+img = imp.img_to_array(img)
 #img = np.array(img)
 image.append(img)
 voc = VOC_Tool('../../Train/VOC2012', ['car'], (300, 300, 3))
 voc.loadCheckpoint('save.h5')
 voc.initModel()
 ans = voc.predict('image/2007_003051.jpg')
-results = voc.bbox.detection_out(ans)
+gt_tmp = []
+gt = voc.getGT('2007_003051', 'car')
+testPoint1 = gt
+# <TODO todo=debug>
+# <Debug> gt = array([], shape=(0, 5), dtype=float64) </Debug>
+(x_tmp, gt) = voc.random_sized_crop(x_tmp, gt)
+# </TODO>
+testPoint2 = gt
+# >>> testPoint2 = array([], shape=(0, 5), dtype=float64)
+gt = voc.bbox.assign_boxes(gt)
+gt_tmp.append(gt)
+gt = np.array(gt_tmp, dtype=np.float32)
+y_tmp = gt
+#print(np.shape(ans))
+#print(np.shape(y_tmp))
+results_old = voc.bbox.detection_out(ans)
+results = voc.bbox.detection_out(y_tmp)
 #for i, img in enumerate(image):
 # Parse the outputs.
 det_label = results[0][:, 0]

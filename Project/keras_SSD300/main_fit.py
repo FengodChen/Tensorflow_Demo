@@ -148,8 +148,6 @@ class VOC_Tool():
         y = int(y)
         img = img[y:y+h, x:x+w]
         new_targets = []
-        if (targets == None):
-            return img
         for box in targets:
             cx = 0.5 * (box[0] + box[2])
             cy = 0.5 * (box[1] + box[3])
