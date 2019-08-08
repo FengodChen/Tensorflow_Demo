@@ -79,6 +79,8 @@ class VOC_Tool():
         img_width = len(img[0])
         # TODO
         img_resize = cv2.resize(img, (self.input_shape[1], self.input_shape[0]))
+        img_resize = img_resize[..., ::-1]
+        img_resize = img_resize.astype(np.float32) / 255.0
         return (img_resize, img_height, img_width, objs_list)
     
     def getGT(self, img_ID, class_name):

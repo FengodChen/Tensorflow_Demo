@@ -58,9 +58,10 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '0'  # or any {'0', '2', '3'}
 image = []
 img = cv2.imread('image/2007_003051.jpg')
 img = cv2.resize(img, (300, 300))
+img = img[...,::-1]
 #img = np.array(img)
 image.append(img)
-voc = VOC_Tool('../../Train/VOC2012', ['car', 'cat'], (300, 300, 3))
+voc = VOC_Tool('../../Train/VOC2012', ['car'], (300, 300, 3))
 voc.loadCheckpoint('save.h5')
 voc.initModel()
 ans = voc.predict('image/2007_003051.jpg')
