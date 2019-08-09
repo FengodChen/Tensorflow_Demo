@@ -31,8 +31,9 @@ class VOC_Tool():
         # <TODO>
         #self.bbox = BBoxUtility(self.classes_num + 1, pickle.load(open('prior_boxes_ssd300.pkl', 'rb')))
         prior = pickle.load(open('prior_boxes_ssd300.pkl', 'rb'))
-        prior = prior[:6537, :]
+        #prior = prior[:6537, :]
         self.bbox = BBoxUtility(self.classes_num + 1, prior)
+        #self.bbox = BBoxUtility(self.classes_num + 1)
         # </TODO>
         self.model = SSD300(self.input_shape, self.classes_num + 1)
         self.do_crop = do_crop
@@ -101,7 +102,8 @@ class VOC_Tool():
         oneHot = self.getOneHot(class_name)
         for obj in objs_list:
             gt_tmp = []
-            '''
+            # <TODO todo=debug>
+            # <Debug> If GT need Normalized? </Debug>
             gt_tmp.append(obj['xmin']/img_width)
             gt_tmp.append(obj['ymin']/img_height)
             gt_tmp.append(obj['xmax']/img_width)
@@ -111,6 +113,8 @@ class VOC_Tool():
             gt_tmp.append(obj['ymin'])
             gt_tmp.append(obj['xmax'])
             gt_tmp.append(obj['ymax'])
+            '''
+            # </TODO>
             for oh in oneHot:
                 gt_tmp.append(oh)
             gt_list.append(gt_tmp)

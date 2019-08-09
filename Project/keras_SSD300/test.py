@@ -53,6 +53,7 @@ from main_fit import VOC_Tool
 import cv2
 import numpy as np
 import os
+import pickle
 import matplotlib.pyplot as plt
 from keras.preprocessing import image as imp
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '0'  # or any {'0', '2', '3'}
@@ -73,13 +74,11 @@ voc.initModel()
 ans = voc.predict('image/2007_003051.jpg')
 gt_tmp = []
 gt = voc.getGT('2007_003051', 'car')
+# <Debug>
 testPoint1 = gt
-# <TODO todo=debug>
-# <Debug> gt = array([], shape=(0, 5), dtype=float64) </Debug>
-(x_tmp, gt) = voc.random_sized_crop(x_tmp, gt)
-# </TODO>
-testPoint2 = gt
-# >>> testPoint2 = array([], shape=(0, 5), dtype=float64)
+# This is not very influential for the answer
+#(x_tmp, gt) = voc.random_sized_crop(x_tmp, gt)
+# </Debug>
 gt = voc.bbox.assign_boxes(gt)
 gt_tmp.append(gt)
 gt = np.array(gt_tmp, dtype=np.float32)
@@ -88,6 +87,9 @@ y_tmp = gt
 #print(np.shape(y_tmp))
 results_old = voc.bbox.detection_out(ans)
 results = voc.bbox.detection_out(y_tmp)
+#offical_gt = pickle.load(open('gt_pascal.pkl', 'rb'))
+p = pickle.load(open('prior_boxes_ssd300.pkl', 'rb'))
+# < Debug checkpoint 1 />
 #for i, img in enumerate(image):
 # Parse the outputs.
 det_label = results[0][:, 0]
@@ -106,6 +108,15 @@ top_xmin = det_xmin[top_indices]
 top_ymin = det_ymin[top_indices]
 top_xmax = det_xmax[top_indices]
 top_ymax = det_ymax[top_indices]
+# < Debug checkpoint 2 />
+# <Debug ps=This is work>
+'''
+top_xmin = [testPoint1[0][0]]
+top_ymin = [testPoint1[0][1]]
+top_xmax = [testPoint1[0][2]]
+top_ymax = [testPoint1[0][3]]
+'''
+# </Debug>
 
 colors = plt.cm.hsv(np.linspace(0, 1, 4)).tolist()
 
@@ -113,6 +124,7 @@ plt.imshow(img / 255.)
 currentAxis = plt.gca()
 
 for i in range(top_conf.shape[0]):
+#for i in range(1):
     xmin = int(round(top_xmin[i] * img.shape[1]))
     ymin = int(round(top_ymin[i] * img.shape[0]))
     xmax = int(round(top_xmax[i] * img.shape[1]))
