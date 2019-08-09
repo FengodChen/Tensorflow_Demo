@@ -79,7 +79,15 @@ testPoint1 = gt
 # This is not very influential for the answer
 #(x_tmp, gt) = voc.random_sized_crop(x_tmp, gt)
 # </Debug>
+# <TODO id=190809000>
+# <Comment>
+#     It's return shape(num_boxes, 4 + num_classes + 8), and is array([0., 0., 0., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0.])
+# </Comment>
 gt = voc.bbox.assign_boxes(gt)
+for i in range(len(gt)):
+    for j in range(4):
+        gt[i][j] = testPoint1[0][j]
+# </TODO>
 gt_tmp.append(gt)
 gt = np.array(gt_tmp, dtype=np.float32)
 y_tmp = gt

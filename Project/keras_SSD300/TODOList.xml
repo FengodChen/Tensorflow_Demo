@@ -1,0 +1,16 @@
+<TODOList>
+
+    <TODO>
+        <Date> Aug 9, 2019 </Date>
+        <State> Unfinished </State>
+        <Info> 
+            Fix assign_boxes() and voc.bbox.detection_out() function
+        </Info>
+        <Info>
+            assign_boxes() return shape(num_boxes, 4 + num_classes + 8),
+            and is array([0., 0., 0., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0.]).
+        </Info>
+        <ID> 190809000 </ID>
+    </TODO>
+
+</TODOList>
