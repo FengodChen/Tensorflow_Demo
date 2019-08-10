@@ -13,4 +13,16 @@
         <ID> 190809000 </ID>
     </TODO>
 
+    <TODO>
+        <Date> Aug 11, 2019 </Date>
+        <State> Unfinished </State>
+        <Info>
+            Get Prior Box
+        </Info>
+        <Https>
+            https://zhuanlan.zhihu.com/p/33544892
+            https://github.com/xiaohu2015/DeepLearning_tutorials/blob/master/ObjectDetections/SSD/ssd_anchors.py
+        </Https>
+        <ID> 190811000 </ID>
+
 </TODOList>
