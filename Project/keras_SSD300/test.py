@@ -84,9 +84,14 @@ testPoint1 = gt
 #     It's return shape(num_boxes, 4 + num_classes + 8), and is array([0., 0., 0., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0.])
 # </Comment>
 gt = voc.bbox.assign_boxes(gt)
+# <Debug>
+# <Comment> To make bbox true </Comment>
+'''
 for i in range(len(gt)):
     for j in range(4):
         gt[i][j] = testPoint1[0][j]
+'''
+# </Debug>
 # </TODO>
 gt_tmp.append(gt)
 gt = np.array(gt_tmp, dtype=np.float32)
