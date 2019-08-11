@@ -132,7 +132,7 @@ class BBoxUtility(object):
         best_iou = encoded_boxes[:, :, -1].max(axis=0)
         # <TODO id=190811001>
         best_iou_idx = encoded_boxes[:, :, -1].argmax(axis=0)
-        # </TODO>
+        #best_iou_idx = encoded_boxes[:, :, -1].argmax()
         best_iou_mask = best_iou > 0
         best_iou_idx = best_iou_idx[best_iou_mask]
         assign_num = len(best_iou_idx)
@@ -143,6 +143,7 @@ class BBoxUtility(object):
         assignment[:, 4][best_iou_mask] = 0
         assignment[:, 5:-8][best_iou_mask] = boxes[best_iou_idx, 4:]
         assignment[:, -8][best_iou_mask] = 1
+        # </TODO>
         return assignment
 
     def decode_boxes(self, mbox_loc, mbox_priorbox, variances):

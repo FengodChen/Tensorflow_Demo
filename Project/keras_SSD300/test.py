@@ -68,7 +68,7 @@ img = imp.load_img('image/2007_003051.jpg', (300, 300))
 img = imp.img_to_array(img)
 #img = np.array(img)
 image.append(img)
-voc = VOC_Tool('../../Train/VOC2012', ['car'], (300, 300, 3))
+voc = VOC_Tool('../../Train/VOC2012', ['cat', 'car'], (300, 300, 3))
 voc.loadCheckpoint('save.h5')
 voc.initModel()
 ans = voc.predict('image/2007_003051.jpg')
@@ -111,6 +111,17 @@ testPoint1 = gt
 #     best_iou = encoded_boxes[:, :, -1].max(axis=0) get IoU Array(axis=0)
 #     best_iou: array([0, 0, ..., 0.50121087, ..., 0.53675264, ..., 0])
 # </Comment>
+# <Debug>
+'''
+encoded_boxes = np.apply_along_axis(voc.bbox.encode_box, 1, testPoint1[:, :4])
+encoded_boxes = encoded_boxes.reshape(-1, voc.bbox.num_priors, 5)
+best_iou = encoded_boxes[:, :, -1].max(axis=0)
+best_iou_idx = encoded_boxes[:, :, -1].argmax(axis=0)
+best_iou_mask = best_iou > 0
+best_iou_idx = best_iou_idx[best_iou_mask]
+assign_num = len(best_iou_idx)
+'''
+# </Debug>
 gt = voc.bbox.assign_boxes(gt)
 # <Debug>
 # <Comment> To make bbox true </Comment>
