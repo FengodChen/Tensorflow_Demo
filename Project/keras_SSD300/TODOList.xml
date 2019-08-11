@@ -1,6 +1,7 @@
 <TODOList>
 
     <TODO>
+        <ID> 190809000 </ID>
         <Date> Aug 9, 2019 </Date>
         <State> Unfinished </State>
         <Info> 
@@ -10,10 +11,10 @@
             assign_boxes() return shape(num_boxes, 4 + num_classes + 8),
             and is array([0., 0., 0., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0.]).
         </Info>
-        <ID> 190809000 </ID>
     </TODO>
 
     <TODO>
+        <ID> 190811000 </ID>
         <Date> Aug 11, 2019 </Date>
         <State> Unfinished </State>
         <Info>
@@ -23,6 +24,14 @@
             https://zhuanlan.zhihu.com/p/33544892
             https://github.com/xiaohu2015/DeepLearning_tutorials/blob/master/ObjectDetections/SSD/ssd_anchors.py
         </Https>
-        <ID> 190811000 </ID>
+    
+    <TODO>
+        <ID> 190811001 </ID>
+        <Date> Aug 11, 2019 </Date>
+        <State> Unfinished </State>
+        <Info> 
+            best_iou_idx = encoded_boxes[:, :, -1].argmax(axis=0) return
+            an array(shape=(7308,)) which is both zero, it's not logical
+        </Info>
 
 </TODOList>

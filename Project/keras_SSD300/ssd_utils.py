@@ -130,7 +130,9 @@ class BBoxUtility(object):
         encoded_boxes = np.apply_along_axis(self.encode_box, 1, boxes[:, :4])
         encoded_boxes = encoded_boxes.reshape(-1, self.num_priors, 5)
         best_iou = encoded_boxes[:, :, -1].max(axis=0)
+        # <TODO id=190811001>
         best_iou_idx = encoded_boxes[:, :, -1].argmax(axis=0)
+        # </TODO>
         best_iou_mask = best_iou > 0
         best_iou_idx = best_iou_idx[best_iou_mask]
         assign_num = len(best_iou_idx)
