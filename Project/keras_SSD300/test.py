@@ -59,21 +59,21 @@ from keras.preprocessing import image as imp
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '0'  # or any {'0', '2', '3'}
 image = []
 
-x_tmp = cv2.imread('image/2007_003051.jpg')
+x_tmp = cv2.imread('image/2008_002197.jpg')
 #x_tmp = cv2.resize(x_tmp, (300, 300))
 x_tmp = x_tmp[...,::-1]
 x_tmp = x_tmp.astype(np.float32)
 
-img = imp.load_img('image/2007_003051.jpg', (300, 300))
+img = imp.load_img('image/2008_002197.jpg', (300, 300))
 img = imp.img_to_array(img)
 #img = np.array(img)
 image.append(img)
 voc = VOC_Tool('../../Train/VOC2012', ['cat', 'car'], (300, 300, 3))
-voc.loadCheckpoint('save.h5')
-voc.initModel()
-ans = voc.predict('image/2007_003051.jpg')
+#voc.loadCheckpoint('save.h5')
+#voc.initModel()
+#ans = voc.predict('image/2008_002197.jpg')
 gt_tmp = []
-gt = voc.getGT('2007_003051', 'car')
+gt = voc.getGT('2008_002197', 'car')
 # <Debug>
 testPoint1 = gt
 # This is not very influential for the answer
@@ -137,8 +137,17 @@ gt = np.array(gt_tmp, dtype=np.float32)
 y_tmp = gt
 #print(np.shape(ans))
 #print(np.shape(y_tmp))
-results_old = voc.bbox.detection_out(ans)
+#results_old = voc.bbox.detection_out(ans)
 results = voc.bbox.detection_out(y_tmp)
+'''
+#gt[gt[:,:,-8]>0] #Test all prior which should be penalized
+predictions = gt
+mbox_loc = predictions[:, :, :4]
+variances = predictions[:, :, -4:]
+mbox_priorbox = predictions[:, :, -8:-4]
+mbox_conf = predictions[:, :, 4:-8]
+decode_bbox = voc.bbox.decode_boxes(mbox_loc[0], mbox_priorbox[0], variances[0])
+'''
 #offical_gt = pickle.load(open('gt_pascal.pkl', 'rb'))
 p = pickle.load(open('prior_boxes_ssd300.pkl', 'rb'))
 # < Debug checkpoint 1 />

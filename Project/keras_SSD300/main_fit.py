@@ -94,27 +94,16 @@ class VOC_Tool():
         return img_resize
 
     def getGT(self, img_ID, class_name):
-        # TODO
-        # 不知道xmin...是不是就是dxmin...
         (img, img_height, img_width, objs_list) = self.getImage(img_ID, class_name)
         gt_list = []
         gt_list_np = None
         oneHot = self.getOneHot(class_name)
         for obj in objs_list:
             gt_tmp = []
-            # <TODO todo=debug>
-            # <Debug> If GT need Normalized? </Debug>
             gt_tmp.append(obj['xmin']/img_width)
             gt_tmp.append(obj['ymin']/img_height)
             gt_tmp.append(obj['xmax']/img_width)
             gt_tmp.append(obj['ymax']/img_height)
-            '''
-            gt_tmp.append(obj['xmin'])
-            gt_tmp.append(obj['ymin'])
-            gt_tmp.append(obj['xmax'])
-            gt_tmp.append(obj['ymax'])
-            '''
-            # </TODO>
             for oh in oneHot:
                 gt_tmp.append(oh)
             gt_list.append(gt_tmp)
