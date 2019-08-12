@@ -108,6 +108,7 @@ class BBoxUtility(object):
         encoded_box[:, 2:4][assign_mask] = np.log(box_wh /
                                                   assigned_priors_wh)
         encoded_box[:, 2:4][assign_mask] /= assigned_priors[:, -2:]
+
         return encoded_box.ravel()
 
     def assign_boxes(self, boxes):
@@ -143,6 +144,12 @@ class BBoxUtility(object):
         assignment[:, 4][best_iou_mask] = 0
         assignment[:, 5:-8][best_iou_mask] = boxes[best_iou_idx, 4:]
         assignment[:, -8][best_iou_mask] = 1
+        # <Debug>
+        #assignment[:, -8:-4][best_iou_mask] = self.priors[best_iou_idx, :4]
+        #priors = np.apply_along_axis(self.encode_box, 0, self.priors[:4])
+        #assignment[:, -8:-4][best_iou_mask] = priors[best_iou_idx, :4]
+        #assignment[:, -8:-4][best_iou_mask] = [0.9,0.9,1.,1.]
+        # </Debug>
         # </TODO>
         return assignment
 

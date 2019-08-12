@@ -33,6 +33,12 @@
             best_iou_idx = encoded_boxes[:, :, -1].argmax(axis=0) return
             an array(shape=(7308,)) which is both zero, it's not logical
         </Info>
+        <Info>
+            assignment[:, -8:] are both zero, but decode_boxes uses:
+                assignment[:, :, -4:] as variances,
+                assignment[:, :, -8:-4] as mbox_prriorbox.
+            I suppose it is some wrong
+        </Info>
     </TODO>
 
 </TODOList>

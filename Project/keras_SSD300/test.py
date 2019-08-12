@@ -133,6 +133,7 @@ for i in range(len(gt)):
 # </Debug>
 # </TODO>
 gt_tmp.append(gt)
+#gt_tmp.append(gt.tolist())
 gt = np.array(gt_tmp, dtype=np.float32)
 y_tmp = gt
 #print(np.shape(ans))
