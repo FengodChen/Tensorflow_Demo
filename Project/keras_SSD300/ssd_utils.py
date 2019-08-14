@@ -147,7 +147,8 @@ class BBoxUtility(object):
         # <Debug>
         #assignment[:, -8:-4][best_iou_mask] = self.priors[best_iou_idx, :4]
         #priors = np.apply_along_axis(self.encode_box, 0, self.priors[:4])
-        #assignment[:, -8:-4][best_iou_mask] = priors[best_iou_idx, :4]
+        assignment[:, -8:-4][best_iou_mask] = self.priors[best_iou_mask, :4]
+        assignment[:, -4:][best_iou_mask] = self.priors[best_iou_mask, 4:]
         #assignment[:, -8:-4][best_iou_mask] = [0.9,0.9,1.,1.]
         # </Debug>
         # </TODO>
