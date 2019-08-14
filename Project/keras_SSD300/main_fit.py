@@ -31,7 +31,7 @@ class VOC_Tool():
         # <TODO>
         #self.bbox = BBoxUtility(self.classes_num + 1, pickle.load(open('prior_boxes_ssd300.pkl', 'rb')))
         prior = pickle.load(open('prior_boxes_ssd300.pkl', 'rb'))
-        #prior = prior[:6537, :]
+        prior = prior[:6537, :]
         self.bbox = BBoxUtility(self.classes_num + 1, prior)
         #self.bbox = BBoxUtility(self.classes_num + 1)
         # </TODO>
@@ -210,7 +210,8 @@ class VOC_Tool():
         x = applications.keras_applications.imagenet_utils.preprocess_input(x, data_format='channels_last')
         y = np.array(y, dtype=np.float32)
 
-        keras.backend.get_session().run(tf.global_variables_initializer())
+        #keras.backend.get_session().run(tf.global_variables_initializer())
+        tf.compat.v1.keras.backend.get_session().run(tf.compat.v1.global_variables_initializer())
 
         self.model.fit(x, y,
                        batch_size = batch_size,

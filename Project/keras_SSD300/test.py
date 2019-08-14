@@ -68,10 +68,10 @@ img = imp.load_img('image/2008_002197.jpg', (300, 300))
 img = imp.img_to_array(img)
 #img = np.array(img)
 image.append(img)
-voc = VOC_Tool('../../Train/VOC2012', ['cat', 'car'], (300, 300, 3))
-#voc.loadCheckpoint('save.h5')
-#voc.initModel()
-#ans = voc.predict('image/2008_002197.jpg')
+voc = VOC_Tool('../../Train/VOC2012', ['car'], (300, 300, 3))
+voc.loadCheckpoint('save.h5')
+voc.initModel()
+ans = voc.predict('image/2008_002197.jpg')
 gt_tmp = []
 gt = voc.getGT('2008_002197', 'car')
 # <Debug>
@@ -138,8 +138,8 @@ gt = np.array(gt_tmp, dtype=np.float32)
 y_tmp = gt
 #print(np.shape(ans))
 #print(np.shape(y_tmp))
-#results_old = voc.bbox.detection_out(ans)
-results = voc.bbox.detection_out(y_tmp)
+results = voc.bbox.detection_out(ans)
+results_true = voc.bbox.detection_out(y_tmp)
 '''
 #gt[gt[:,:,-8]>0] #Test all prior which should be penalized
 predictions = gt

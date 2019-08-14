@@ -11,7 +11,7 @@ def train():
         voc = VOC_Tool('../../Train/VOC2012', ['car'], (300, 300, 3))
         voc.loadCheckpoint('save.h5')
         voc.initModel()
-        voc.fit(4096, 'car')
+        voc.fit(1024, 'car')
 
 def predict():
     voc = VOC_Tool('../../Train/VOC2012', ['car'], (300, 300, 3))
@@ -25,7 +25,7 @@ def debugTrain():
     #voc.initModel(False)
     voc.initModel()
     #voc.model.load_model()
-    #voc.model.load_weights('./model_save/checkpoint/save.h5')
+    voc.model.load_weights('./model_save/checkpoint/save.h5')
     voc.fit_single(classes_list[0], '2007_003051', epochs=100, size=1)
     #voc.model.save_weights('./model_save/save/save.h5')
     '''
