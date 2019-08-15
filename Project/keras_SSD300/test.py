@@ -59,11 +59,10 @@ image.append(img)
 voc = VOC_Tool('../../Train/VOC2012', ['car'], (300, 300, 3))
 voc.loadCheckpoint('save.h5')
 voc.initModel()
-ans = voc.predict('image/2008_002197.jpg')
+(img, ans) = voc.predict('image/2008_002197.jpg')
 gt_tmp = []
-gt = voc.getGT('2008_002197', 'car')
+gt = voc.getGT_Debug('2008_002197', 'car')
 # <Debug>
-testPoint1 = gt
 # This is not very influential for the answer
 #(x_tmp, gt) = voc.random_sized_crop(x_tmp, gt)
 # </Debug>
@@ -100,8 +99,6 @@ testPoint1 = gt
 #     best_iou: array([0, 0, ..., 0.50121087, ..., 0.53675264, ..., 0])
 # </Comment>
 # </TODO>
-gt = voc.bbox.assign_boxes(gt)
-gt_tmp.append(gt)
-gt = np.array(gt_tmp, dtype=np.float32)
 
 voc.showPredictImg(image[0], gt)
+#voc.showPredictImg(image[0], ans)

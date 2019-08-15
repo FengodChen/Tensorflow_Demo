@@ -158,6 +158,17 @@ class VOC_Tool():
             gt_list.append(gt_tmp)
             gt_list_np = np.array(gt_list, dtype=float)
         return gt_list_np
+    
+    def getGT_Debug(self, img_ID, class_name):
+        '''
+        Return the True Predict Answer that the predict function should return
+        '''
+        gt_tmp = []
+        gt = self.getGT(img_ID, class_name)
+        gt = self.bbox.assign_boxes(gt)
+        gt_tmp.append(gt)
+        gt = np.array(gt_tmp, dtype=np.float32)
+        return gt
 
     def getRandomList(self, size, class_name):
         tmp = self.classes_inf_nameprop[class_name]
