@@ -157,7 +157,6 @@ class VOC_Tool():
                 gt_tmp.append(oh)
             gt_list.append(gt_tmp)
             gt_list_np = np.array(gt_list, dtype=float)
-            (img, gt_list_np) = self.random_sized_crop(img, gt_list_np)
         return gt_list_np
 
     def getRandomList(self, size, class_name):
@@ -262,4 +261,48 @@ class VOC_Tool():
         #keras.backend.get_session().run(tf.global_variables_initializer())
         tf.compat.v1.keras.backend.get_session().run(tf.compat.v1.global_variables_initializer())
         ans = self.model.predict(img_list)
-        return ans
+        return (img, ans)
+    
+    def showPredictImg(self, img, ans):
+        results = self.bbox.detection_out(ans)
+        #img = image[0]
+        #for i, img in enumerate(image):
+        # Parse the outputs.
+        det_label = results[0][:, 0]
+        det_conf = results[0][:, 1]
+        det_xmin = results[0][:, 2]
+        det_ymin = results[0][:, 3]
+        det_xmax = results[0][:, 4]
+        det_ymax = results[0][:, 5]
+        
+        # Get detections with confidence higher than 0.6.
+        top_indices = [i for i, conf in enumerate(det_conf) if conf >= 0.6]
+        
+        top_conf = det_conf[top_indices]
+        top_label_indices = det_label[top_indices].tolist()
+        top_xmin = det_xmin[top_indices]
+        top_ymin = det_ymin[top_indices]
+        top_xmax = det_xmax[top_indices]
+        top_ymax = det_ymax[top_indices]
+        
+        colors = plt.cm.hsv(np.linspace(0, 1, 4)).tolist()
+        
+        plt.imshow(img / 255.)
+        currentAxis = plt.gca()
+        
+        for i in range(top_conf.shape[0]):
+        #for i in range(1):
+            xmin = int(round(top_xmin[i] * img.shape[1]))
+            ymin = int(round(top_ymin[i] * img.shape[0]))
+            xmax = int(round(top_xmax[i] * img.shape[1]))
+            ymax = int(round(top_ymax[i] * img.shape[0]))
+            score = top_conf[i]
+            label_index = int(top_label_indices[i]) - 1
+            label = self.classes_list[label_index]
+            display_txt = '{:0.2f}, {}'.format(score, label)
+            coords = (xmin, ymin), xmax-xmin+1, ymax-ymin+1
+            color = colors[label_index]
+            currentAxis.add_patch(plt.Rectangle(*coords, fill=False, edgecolor=color, linewidth=2))
+            currentAxis.text(xmin, ymin, display_txt, bbox={'facecolor':color, 'alpha':0.5})
+        
+        plt.show()

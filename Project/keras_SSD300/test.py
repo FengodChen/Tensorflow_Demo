@@ -24,18 +24,6 @@ targets = []
 targets.append(yy)
 tmp_targets = np.array(targets)
 results = bb.detection_out(tmp_targets)
-# label
-# results[i][:, 0]
-# conf
-# results[i][:, 1]
-# xmin
-# results[i][:, 2]
-# ymin
-# results[i][:, 3]
-# xmax
-# results[i][:, 4]
-# ymax
-# results[i][:, 5]
 
 # Input is img_resize, Output is bbox.assign_boxes(gt[key])
 '''
@@ -111,82 +99,9 @@ testPoint1 = gt
 #     best_iou = encoded_boxes[:, :, -1].max(axis=0) get IoU Array(axis=0)
 #     best_iou: array([0, 0, ..., 0.50121087, ..., 0.53675264, ..., 0])
 # </Comment>
-# <Debug>
-'''
-encoded_boxes = np.apply_along_axis(voc.bbox.encode_box, 1, testPoint1[:, :4])
-encoded_boxes = encoded_boxes.reshape(-1, voc.bbox.num_priors, 5)
-best_iou = encoded_boxes[:, :, -1].max(axis=0)
-best_iou_idx = encoded_boxes[:, :, -1].argmax(axis=0)
-best_iou_mask = best_iou > 0
-best_iou_idx = best_iou_idx[best_iou_mask]
-assign_num = len(best_iou_idx)
-'''
-# </Debug>
-gt = voc.bbox.assign_boxes(gt)
-# <Debug>
-# <Comment> To make bbox true </Comment>
-'''
-for i in range(len(gt)):
-    for j in range(4):
-        gt[i][j] = testPoint1[0][j]
-'''
-# </Debug>
 # </TODO>
+gt = voc.bbox.assign_boxes(gt)
 gt_tmp.append(gt)
-#gt_tmp.append(gt.tolist())
 gt = np.array(gt_tmp, dtype=np.float32)
-y_tmp = gt
-#print(np.shape(ans))
-#print(np.shape(y_tmp))
-results = voc.bbox.detection_out(ans)
-results_true = voc.bbox.detection_out(y_tmp)
-'''
-#gt[gt[:,:,-8]>0] #Test all prior which should be penalized
-predictions = gt
-mbox_loc = predictions[:, :, :4]
-variances = predictions[:, :, -4:]
-mbox_priorbox = predictions[:, :, -8:-4]
-mbox_conf = predictions[:, :, 4:-8]
-decode_bbox = voc.bbox.decode_boxes(mbox_loc[0], mbox_priorbox[0], variances[0])
-'''
-#offical_gt = pickle.load(open('gt_pascal.pkl', 'rb'))
-p = pickle.load(open('prior_boxes_ssd300.pkl', 'rb'))
-#for i, img in enumerate(image):
-# Parse the outputs.
-det_label = results[0][:, 0]
-det_conf = results[0][:, 1]
-det_xmin = results[0][:, 2]
-det_ymin = results[0][:, 3]
-det_xmax = results[0][:, 4]
-det_ymax = results[0][:, 5]
 
-# Get detections with confidence higher than 0.6.
-top_indices = [i for i, conf in enumerate(det_conf) if conf >= 0.6]
-
-top_conf = det_conf[top_indices]
-top_label_indices = det_label[top_indices].tolist()
-top_xmin = det_xmin[top_indices]
-top_ymin = det_ymin[top_indices]
-top_xmax = det_xmax[top_indices]
-top_ymax = det_ymax[top_indices]
-
-colors = plt.cm.hsv(np.linspace(0, 1, 4)).tolist()
-
-plt.imshow(img / 255.)
-currentAxis = plt.gca()
-
-for i in range(top_conf.shape[0]):
-#for i in range(1):
-    xmin = int(round(top_xmin[i] * img.shape[1]))
-    ymin = int(round(top_ymin[i] * img.shape[0]))
-    xmax = int(round(top_xmax[i] * img.shape[1]))
-    ymax = int(round(top_ymax[i] * img.shape[0]))
-    score = top_conf[i]
-    label = int(top_label_indices[i])
-    display_txt = '{:0.2f}, {}'.format(score, label)
-    coords = (xmin, ymin), xmax-xmin+1, ymax-ymin+1
-    color = colors[label]
-    currentAxis.add_patch(plt.Rectangle(*coords, fill=False, edgecolor=color, linewidth=2))
-    currentAxis.text(xmin, ymin, display_txt, bbox={'facecolor':color, 'alpha':0.5})
-
-plt.show()
+voc.showPredictImg(image[0], gt)

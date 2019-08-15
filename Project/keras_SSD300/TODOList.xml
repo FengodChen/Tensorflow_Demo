@@ -1,22 +1,8 @@
 <TODOList>
 
     <TODO>
-        <ID> 190809000 </ID>
-        <Date> Aug 9, 2019 </Date>
-        <State> Unfinished </State>
-        <Info> 
-            Fix assign_boxes() and voc.bbox.detection_out() function
-        </Info>
-        <Info>
-            assign_boxes() return shape(num_boxes, 4 + num_classes + 8),
-            and is array([0., 0., 0., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0.]).
-        </Info>
-    </TODO>
-
-    <TODO>
         <ID> 190811000 </ID>
         <Date> Aug 11, 2019 </Date>
-        <State> Unfinished </State>
         <Info>
             Get Prior Box
         </Info>
@@ -28,7 +14,6 @@
     <TODO>
         <ID> 190811001 </ID>
         <Date> Aug 11, 2019 </Date>
-        <State> Unfinished </State>
         <Info> 
             best_iou_idx = encoded_boxes[:, :, -1].argmax(axis=0) return
             an array(shape=(7308,)) which is both zero, it's not logical
@@ -36,8 +21,16 @@
         <Info>
             assignment[:, -8:] are both zero, but decode_boxes uses:
                 assignment[:, :, -4:] as variances,
-                assignment[:, :, -8:-4] as mbox_prriorbox.
+                assignment[:, :, -8:-4] as mbox_priorbox.
             I suppose it is some wrong
+        </Info>
+    </TODO>
+
+    <TODO>
+        <ID> 190815000 </ID>
+        <Date> Aug 15, 2019 <Date>
+        <Info>
+            Think out how the net use priro box
         </Info>
     </TODO>
 
