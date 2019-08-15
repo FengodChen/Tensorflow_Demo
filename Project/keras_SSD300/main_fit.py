@@ -93,23 +93,6 @@ class VOC_Tool():
         img_resize = img_resize.astype(np.float32) / 255.0
         return img_resize
 
-    def getGT(self, img_ID, class_name):
-        (img, img_height, img_width, objs_list) = self.getImage(img_ID, class_name)
-        gt_list = []
-        gt_list_np = None
-        oneHot = self.getOneHot(class_name)
-        for obj in objs_list:
-            gt_tmp = []
-            gt_tmp.append(obj['xmin']/img_width)
-            gt_tmp.append(obj['ymin']/img_height)
-            gt_tmp.append(obj['xmax']/img_width)
-            gt_tmp.append(obj['ymax']/img_height)
-            for oh in oneHot:
-                gt_tmp.append(oh)
-            gt_list.append(gt_tmp)
-            gt_list_np = np.array(gt_list, dtype=float)
-        return gt_list_np
-
     def random_sized_crop(self, img, targets):
         img_w = img.shape[1]
         img_h = img.shape[0]
@@ -158,7 +141,25 @@ class VOC_Tool():
                 new_targets.append(box)
         new_targets = np.asarray(new_targets).reshape(-1, targets.shape[1])
         return (img, new_targets)
-    
+
+    def getGT(self, img_ID, class_name):
+        (img, img_height, img_width, objs_list) = self.getImage(img_ID, class_name)
+        gt_list = []
+        gt_list_np = None
+        oneHot = self.getOneHot(class_name)
+        for obj in objs_list:
+            gt_tmp = []
+            gt_tmp.append(obj['xmin']/img_width)
+            gt_tmp.append(obj['ymin']/img_height)
+            gt_tmp.append(obj['xmax']/img_width)
+            gt_tmp.append(obj['ymax']/img_height)
+            for oh in oneHot:
+                gt_tmp.append(oh)
+            gt_list.append(gt_tmp)
+            gt_list_np = np.array(gt_list, dtype=float)
+            (img, gt_list_np) = self.random_sized_crop(img, gt_list_np)
+        return gt_list_np
+
     def getRandomList(self, size, class_name):
         tmp = self.classes_inf_nameprop[class_name]
         ranList = []

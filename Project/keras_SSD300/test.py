@@ -151,7 +151,6 @@ decode_bbox = voc.bbox.decode_boxes(mbox_loc[0], mbox_priorbox[0], variances[0])
 '''
 #offical_gt = pickle.load(open('gt_pascal.pkl', 'rb'))
 p = pickle.load(open('prior_boxes_ssd300.pkl', 'rb'))
-# < Debug checkpoint 1 />
 #for i, img in enumerate(image):
 # Parse the outputs.
 det_label = results[0][:, 0]
@@ -170,15 +169,6 @@ top_xmin = det_xmin[top_indices]
 top_ymin = det_ymin[top_indices]
 top_xmax = det_xmax[top_indices]
 top_ymax = det_ymax[top_indices]
-# < Debug checkpoint 2 />
-# <Debug ps=This is work>
-'''
-top_xmin = [testPoint1[0][0]]
-top_ymin = [testPoint1[0][1]]
-top_xmax = [testPoint1[0][2]]
-top_ymax = [testPoint1[0][3]]
-'''
-# </Debug>
 
 colors = plt.cm.hsv(np.linspace(0, 1, 4)).tolist()
 
