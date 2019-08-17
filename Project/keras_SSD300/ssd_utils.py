@@ -131,9 +131,7 @@ class BBoxUtility(object):
         encoded_boxes = np.apply_along_axis(self.encode_box, 1, boxes[:, :4])
         encoded_boxes = encoded_boxes.reshape(-1, self.num_priors, 5)
         best_iou = encoded_boxes[:, :, -1].max(axis=0)
-        # <TODO id=190811001>
         best_iou_idx = encoded_boxes[:, :, -1].argmax(axis=0)
-        #best_iou_idx = encoded_boxes[:, :, -1].argmax()
         best_iou_mask = best_iou > 0
         best_iou_idx = best_iou_idx[best_iou_mask]
         assign_num = len(best_iou_idx)
@@ -144,12 +142,10 @@ class BBoxUtility(object):
         assignment[:, 4][best_iou_mask] = 0
         assignment[:, 5:-8][best_iou_mask] = boxes[best_iou_idx, 4:]
         assignment[:, -8][best_iou_mask] = 1
+        # <TODO id=190811001>
         # <Debug>
-        #assignment[:, -8:-4][best_iou_mask] = self.priors[best_iou_idx, :4]
-        #priors = np.apply_along_axis(self.encode_box, 0, self.priors[:4])
-        assignment[:, -8:-4][best_iou_mask] = self.priors[best_iou_mask, :4]
-        assignment[:, -4:][best_iou_mask] = self.priors[best_iou_mask, 4:]
-        #assignment[:, -8:-4][best_iou_mask] = [0.9,0.9,1.,1.]
+        #assignment[:, -8:-4][best_iou_mask] = self.priors[best_iou_mask, :4]
+        #assignment[:, -4:][best_iou_mask] = self.priors[best_iou_mask, 4:]
         # </Debug>
         # </TODO>
         return assignment

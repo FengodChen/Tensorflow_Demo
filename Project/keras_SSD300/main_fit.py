@@ -12,7 +12,8 @@ from random import shuffle
 from xml.dom import minidom
 
 from ssd_utils import BBoxUtility
-from ssd_fit import MultiboxLoss
+#from ssd_fit import MultiboxLoss
+from ssd_fit import SSDLoss
 from ssd_model import SSD300
 
 class VOC_Tool():
@@ -159,7 +160,7 @@ class VOC_Tool():
             gt_list_np = np.array(gt_list, dtype=float)
         return gt_list_np
     
-    def getGT_Debug(self, img_ID, class_name):
+    def getAssignBoxes(self, img_ID, class_name):
         '''
         Return the True Predict Answer that the predict function should return
         '''
@@ -197,11 +198,12 @@ class VOC_Tool():
                                                           save_weights_only=True,
                                                           #save_best_only=True,
                                                           #monitor='val_loss',
-                                                          save_freq=5,
+                                                          save_freq=256,
                                                           load_weights_on_restart=True
                                                           )]
         self.model.compile(optimizer = keras.optimizers.Adam(3e-4),
-                      loss = MultiboxLoss(self.classes_num, neg_pos_ratio=2.0).compute_loss,
+                      #loss = MultiboxLoss(self.classes_num, neg_pos_ratio=2.0).compute_loss,
+                      loss = SSDLoss(alpha=1.0, neg_pos_ratio=3.0).compute,
                       metrics=['accuracy']
                       )
     def fit(self, size, class_name, batch_size=8, epochs=10):

@@ -60,8 +60,7 @@ voc = VOC_Tool('../../Train/VOC2012', ['car'], (300, 300, 3))
 voc.loadCheckpoint('save.h5')
 voc.initModel()
 (img, ans) = voc.predict('image/2008_002197.jpg')
-gt_tmp = []
-gt = voc.getGT_Debug('2008_002197', 'car')
+gt = voc.getAssignBoxes('2008_002197', 'car')
 # <Debug>
 # This is not very influential for the answer
 #(x_tmp, gt) = voc.random_sized_crop(x_tmp, gt)

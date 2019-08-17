@@ -39,6 +39,6 @@ def debugPredict():
     voc.loadCheckpoint('save.h5')
     return voc.predict('image/2007_003051.jpg')
 if __name__ == "__main__":
-    #train()
+    train()
     #predict()
-    debugTrain()
+    #debugTrain()
