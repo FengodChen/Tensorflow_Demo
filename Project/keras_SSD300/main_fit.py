@@ -201,10 +201,12 @@ class VOC_Tool():
                                                           save_freq=256,
                                                           load_weights_on_restart=True
                                                           )]
-        self.model.compile(optimizer = keras.optimizers.Adam(3e-4),
+        loss = SSDLoss(alpha=1.0, neg_pos_ratio=3.0)
+        self.model.compile(optimizer = keras.optimizers.Adam(lr=1e-4, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0),
                       #loss = MultiboxLoss(self.classes_num, neg_pos_ratio=2.0).compute_loss,
-                      loss = SSDLoss(alpha=1.0, neg_pos_ratio=3.0).compute,
-                      metrics=['accuracy']
+                      loss = loss.compute,
+                      #metrics=['accuracy']
+                      metrics = loss.metrics
                       )
     def fit(self, size, class_name, batch_size=8, epochs=10):
         self.initModel()
