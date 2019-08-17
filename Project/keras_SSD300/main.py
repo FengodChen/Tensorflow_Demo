@@ -23,22 +23,24 @@ def debugTrain():
     classes_list = ['car']
     voc = VOC_Tool('../../Train/VOC2012', classes_list, (300, 300, 3))
     #voc.initModel(False)
-    voc.initModel()
+    voc.initModel(save_freq=64)
     #voc.model.load_model()
     #voc.model.load_weights('./model_save/checkpoint/save.h5')
-    voc.fit_single(classes_list[0], '2007_003051', epochs=100, size=1)
+    voc.fit_single(classes_list[0], '2007_003051', epochs=256, size=1)
     #voc.model.save_weights('./model_save/save/save.h5')
     '''
     while (True):
         voc.loadCheckpoint('save.h5')
         voc.fit_single(classes_list[0], '2007_003051')
     '''
+
 def debugPredict():
     voc = VOC_Tool('../../Train/VOC2012', ['car'], (300, 300, 3))
     voc.initModel()
     voc.loadCheckpoint('save.h5')
     return voc.predict('image/2007_003051.jpg')
+
 if __name__ == "__main__":
-    train()
+    #train()
     #predict()
-    #debugTrain()
+    debugTrain()

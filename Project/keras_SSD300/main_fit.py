@@ -191,14 +191,14 @@ class VOC_Tool():
         file_path = self.save_path + file_name
         self.model.load_weights(file_path)
 
-    def initModel(self):
+    def initModel(self, save_freq=256):
         checkfile_name = 'save.h5'
         self.callbacks = [keras.callbacks.ModelCheckpoint(self.checkpoint_path + checkfile_name,
                                                           verbose=1,
                                                           save_weights_only=True,
                                                           #save_best_only=True,
                                                           #monitor='val_loss',
-                                                          save_freq=256,
+                                                          save_freq=save_freq,
                                                           load_weights_on_restart=True
                                                           )]
         loss = SSDLoss(alpha=1.0, neg_pos_ratio=3.0)

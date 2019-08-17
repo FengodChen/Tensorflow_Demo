@@ -48,7 +48,7 @@ def softmax_loss(y_true, y_pred):
     """
     eps = K.epsilon()
     y_pred = K.clip(y_pred, eps, 1.-eps)
-    loss = - y_true * tf.log(y_pred)
+    loss = - y_true * tf.math.log(y_pred)
     return tf.reduce_sum(loss, axis=-1)
 
 def cross_entropy_loss(y_true, y_pred):
