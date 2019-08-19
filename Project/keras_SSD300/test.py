@@ -99,5 +99,5 @@ gt = voc.getAssignBoxes('2008_002197', 'car')
 # </Comment>
 # </TODO>
 
-voc.showPredictImg(image[0], gt)
-#voc.showPredictImg(image[0], ans)
+#voc.showPredictImg(image[0], gt)
+voc.showPredictImg(image[0], ans)
