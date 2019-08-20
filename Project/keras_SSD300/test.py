@@ -56,7 +56,7 @@ img = imp.load_img('image/2008_002197.jpg', (300, 300))
 img = imp.img_to_array(img)
 #img = np.array(img)
 image.append(img)
-voc = VOC_Tool('../../Train/VOC2012', ['car'], (300, 300, 3))
+voc = VOC_Tool('../../Train/VOC2012', ['car', 'person'], (300, 300, 3))
 voc.loadCheckpoint('save.h5')
 voc.initModel()
 (img, ans) = voc.predict('image/2008_002197.jpg')
@@ -99,5 +99,18 @@ gt = voc.getAssignBoxes('2008_002197', 'car')
 # </Comment>
 # </TODO>
 
+# <Debug>
+ptr = 0
+for i in gt[0,:,5]:
+    if (i > 0.85):
+        print('gt[{}]:{}'.format(ptr, i))
+        print('pre[{}]:{}'.format(ptr, ans[0,ptr,5]))
+
+ptr = 0
+for i in ans[0,:,5]:
+    if (i > 0.85):
+        print('pre[{}]:{}'.format(ptr, i))
+        print('gt[{}]:{}'.format(ptr, gt[0,ptr,5]))
+# </Debug>
 #voc.showPredictImg(image[0], gt)
 voc.showPredictImg(image[0], ans)

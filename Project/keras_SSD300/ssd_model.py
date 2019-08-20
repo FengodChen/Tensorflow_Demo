@@ -142,8 +142,8 @@ def SSD300(input_shape, classes_num):
                                axis=2, name='predictions')
     model = keras.models.Model(net['input'], net['predictions'])
     # Freezen VGG16 weight
-    #for vgg in model.layers[:19]:
-    for vgg in model.layers[:11]:
+    for vgg in model.layers[:19]:
+    #for vgg in model.layers[:11]:
         vgg.trainable = False
 
     return model
