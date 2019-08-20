@@ -141,6 +141,7 @@ def SSD300(input_shape, classes_num):
                                net['mbox_priorbox']],
                                axis=2, name='predictions')
     model = keras.models.Model(net['input'], net['predictions'])
+    # <TODO id=190820000>
     # <Debug>
     # Freezen VGG16 weight
     '''
@@ -149,4 +150,5 @@ def SSD300(input_shape, classes_num):
         vgg.trainable = False
     '''
     # </Debug>
+    # </TODO>
     return model
