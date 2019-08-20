@@ -12,7 +12,7 @@ from random import shuffle
 from xml.dom import minidom
 
 from ssd_utils import BBoxUtility
-#from ssd_fit import MultiboxLoss
+from ssd_fit_old import MultiboxLoss
 from ssd_fit import SSDLoss
 from ssd_model import SSD300
 
@@ -201,12 +201,12 @@ class VOC_Tool():
                                                           save_freq=save_freq,
                                                           load_weights_on_restart=True
                                                           )]
-        loss = SSDLoss(alpha=1.0, neg_pos_ratio=3.0)
+        #loss = SSDLoss(alpha=1.0, neg_pos_ratio=3.0)
         self.model.compile(optimizer = keras.optimizers.Adam(lr=1e-4, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0),
-                      #loss = MultiboxLoss(self.classes_num, neg_pos_ratio=2.0).compute_loss,
-                      loss = loss.compute,
+                      loss = MultiboxLoss(self.classes_num, neg_pos_ratio=2.0).compute_loss,
+                      #loss = loss.compute,
                       #metrics=['accuracy']
-                      metrics = loss.metrics
+                      #metrics = loss.metrics
                       )
     def fit(self, size, class_name, batch_size=8, epochs=10):
         self.initModel()
