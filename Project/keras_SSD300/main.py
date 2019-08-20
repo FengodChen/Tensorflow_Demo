@@ -10,7 +10,7 @@ def train():
     while (True):
         voc = VOC_Tool('../../Train/VOC2012', ['car', 'person'], (300, 300, 3))
         voc.initModel()
-        voc.loadCheckpoint('save.h5')
+        #voc.loadCheckpoint('save.h5')
         voc.fit(1024, 'car')
 
 def predict():
