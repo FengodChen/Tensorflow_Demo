@@ -73,12 +73,14 @@ for i in gt[0,:,5]:
     if (i > 0.85):
         print('gt[{}]:{}'.format(ptr, i))
         print('pre[{}]:{}'.format(ptr, ans[0,ptr,5]))
+    ptr += 1
 
 ptr = 0
 for i in ans[0,:,5]:
     if (i > 0.85):
         print('pre[{}]:{}'.format(ptr, i))
         print('gt[{}]:{}'.format(ptr, gt[0,ptr,5]))
+    ptr += 1
 # </Debug>
 # </TODO>
 
