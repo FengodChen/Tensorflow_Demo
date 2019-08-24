@@ -15,12 +15,12 @@ from ssd_utils import BBoxUtility
 from ssd_fit_old import MultiboxLoss
 from ssd_fit import SSDLoss
 from ssd_model import SSD300
-prior = pickle.load(opeprior = pickle.load(open('prior_boxes_ssd300.pkl', 'rb'))n('prior_boxes_ssd300.pkl', 'rb'))
 class VOC_Tool():
     '''
     Classes List not include background class
     '''
-    def __init__(self, voc_path, classes_list, input_shape, checkpoint_path='./model_save/checkpoint/', save_path='./model_save/save/',
+    def __init__(self, voc_path, classes_list, input_shape, 
+                 checkpoint_path='./model_save/checkpoint/', save_path='./model_save/save/', priorboxPath='prior_boxes_ssd300.pkl',
                  do_crop=True, crop_area_range=[0.75, 1.0], aspect_ratio_range=[3./4, 4./3]):
         self.voc_path = voc_path
         self.checkpoint_path = checkpoint_path
@@ -31,9 +31,9 @@ class VOC_Tool():
         self.classes_inf_nameprop = {}
         # <TODO>
         #self.bbox = BBoxUtility(self.classes_num + 1, pickle.load(open('prior_boxes_ssd300.pkl', 'rb')))
-        prior = pickle.load(open('prior_boxes_ssd300.pkl', 'rb'))
-        prior = prior[:6537, :]
-        self.bbox = BBoxUtility(self.classes_num + 1, prior)
+        self.prior = pickle.load(open(priorboxPath, 'rb'))
+        self.prior = self.prior[:6537, :]
+        self.bbox = BBoxUtility(self.classes_num + 1, self.prior)
         #self.bbox = BBoxUtility(self.classes_num + 1)
         # </TODO>
         self.model = SSD300(self.input_shape, self.classes_num + 1)

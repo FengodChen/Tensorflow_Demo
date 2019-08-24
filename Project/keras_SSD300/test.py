@@ -68,6 +68,12 @@ gt = voc.getAssignBoxes('2008_002197', 'car')
 
 # <TODO id=190820001>
 # <Debug>
+for ptr in range(len(voc.prior)):
+    print('prior[{}]:{}'.format(ptr, voc.prior[ptr, :]))
+    print('pre[{}]:{}'.format(ptr, ans[0][ptr, -8:]))
+    input('(ENTER)')
+
+
 ptr = 0
 for i in gt[0,:,5]:
     if (i > 0.85):

@@ -35,7 +35,7 @@ def debugTrain():
     '''
 
 def debugPredict():
-    voc = VOC_Tool('../../Train/VOC2012', ['car'], (300, 300, 3))
+    voc = VOC_Tool('../../Train/VOC2012', ['car', 'person'], (300, 300, 3))
     voc.initModel()
     voc.loadCheckpoint('save.h5')
     return voc.predict('image/2007_003051.jpg')
