@@ -15,7 +15,7 @@ from ssd_utils import BBoxUtility
 from ssd_fit_old import MultiboxLoss
 from ssd_fit import SSDLoss
 from ssd_model import SSD300
-
+prior = pickle.load(opeprior = pickle.load(open('prior_boxes_ssd300.pkl', 'rb'))n('prior_boxes_ssd300.pkl', 'rb'))
 class VOC_Tool():
     '''
     Classes List not include background class

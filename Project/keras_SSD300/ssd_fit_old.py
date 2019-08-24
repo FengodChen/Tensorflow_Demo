@@ -14,8 +14,6 @@ class MultiboxLoss(object):
             it there is no positive boxes in batch.
     # References
         https://arxiv.org/abs/1512.02325
-    # TODO
-        Add possibility for background label id be not zero
     """
     def __init__(self, num_classes, alpha=1.0, neg_pos_ratio=3.0,
                  background_label_id=0, negatives_for_hard=100.0):
@@ -41,6 +39,7 @@ class MultiboxLoss(object):
         """
         abs_loss = tf.abs(y_true - y_pred)
         sq_loss = 0.5 * (y_true - y_pred)**2
+        # Return sq_loss if abs_loss < 1, else return abs_loss-0.5
         l1_loss = tf.where(tf.less(abs_loss, 1.0), sq_loss, abs_loss - 0.5)
         return tf.reduce_sum(l1_loss, -1)
 
