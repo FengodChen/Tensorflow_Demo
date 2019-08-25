@@ -21,7 +21,7 @@ class VOC_Tool():
     '''
     def __init__(self, voc_path, classes_list, input_shape, 
                  checkpoint_path='./model_save/checkpoint/', save_path='./model_save/save/', priorboxPath='prior_boxes_ssd300.pkl',
-                 do_crop=True, crop_area_range=[0.75, 1.0], aspect_ratio_range=[3./4, 4./3]):
+                 do_crop=True, crop_area_range=[0.75, 1.0], aspect_ratio_range=[3./4, 4./3], base_lr=3e-4):
         self.voc_path = voc_path
         self.checkpoint_path = checkpoint_path
         self.save_path = save_path
@@ -42,6 +42,7 @@ class VOC_Tool():
         self.do_crop = do_crop
         self.crop_area_range = crop_area_range
         self.aspect_ratio_range = aspect_ratio_range
+        self.base_lr = base_lr
 
         for class_name in self.classes_list:
             class_inf_nameprop = {}
@@ -217,26 +218,31 @@ class VOC_Tool():
             self.save_path = load_path
         file_path = self.save_path + file_name
         self.model.load_weights(file_path)
+    
+    def learningRateSchedule(self, epoch, decay=0.9):
+        return self.base_lr * decay**(epoch)
 
-    def initModel(self, save_freq=20):
+    def initModel(self, period=1):
         checkfile_name = 'save.h5'
         self.callbacks = [keras.callbacks.ModelCheckpoint(self.checkpoint_path + checkfile_name,
                                                           verbose=1,
                                                           save_weights_only=True,
                                                           #save_best_only=True,
                                                           #monitor='val_loss',
-                                                          save_freq=save_freq,
+                                                          #save_freq=1,
+                                                          period=period,
                                                           load_weights_on_restart=True
-                                                          )]
+                                                          ),
+                          keras.callbacks.LearningRateScheduler(self.learningRateSchedule)]
         #loss = SSDLoss(alpha=1.0, neg_pos_ratio=3.0)
-        self.model.compile(optimizer = keras.optimizers.Adam(lr=1e-4, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0),
+        self.model.compile(optimizer = keras.optimizers.Adam(lr=self.base_lr, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0),
                       loss = MultiboxLoss(self.classes_num, neg_pos_ratio=2.0).compute_loss,
                       #loss = loss.compute,
                       #metrics=['accuracy']
                       #metrics = loss.metrics
                       )
     
-    def generator(self, class_name, batch_size=16):
+    def generator(self, class_name, batch_size=4):
         fit_list = self.getList(class_name)
         np.random.shuffle(fit_list)
         while(True):
@@ -266,11 +272,15 @@ class VOC_Tool():
 
 
 
-    def fit(self, class_name, batch_size=8, epochs=30):
+    def fit(self, class_name, batch_size=4, epochs=30):
         self.initModel()
         steps_per_epoch = len(self.getList(class_name)) // batch_size
         tf.compat.v1.keras.backend.get_session().run(tf.compat.v1.global_variables_initializer())
-        self.model.fit_generator(self.generator(class_name), verbose=1, epochs=epochs,steps_per_epoch=steps_per_epoch)
+        self.model.fit_generator(self.generator(class_name, batch_size=batch_size), 
+                                 verbose=1, 
+                                 epochs=epochs,
+                                 steps_per_epoch=steps_per_epoch,
+                                 callbacks=self.callbacks)
 
     def fit_single(self, class_name, imgID, size=128, batch_size=16, epochs=10):
         '''
@@ -301,8 +311,7 @@ class VOC_Tool():
     
     def predict(self, img_path):
         img_list = []
-        img = self.readImg(img_path)
-        img = self.resizeImage(img)
+        img = self.readImage_resized(img_path)
         img_list.append(img)
         img_list = np.array(img_list, dtype=np.float32)
         img_list = applications.keras_applications.imagenet_utils.preprocess_input(img_list, data_format='channels_last')
