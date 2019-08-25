@@ -43,4 +43,21 @@
         </Info>
     </TODO>
 
+    <TODO>
+        <ID> 20190825000 </ID>
+        <Date> Aug 25, 2019 </Date>
+        <Info>
+            Is it nessesary or true to normolize the cv.read image?
+        </Info>
+    </TODO>
+
+    <TODO>
+        <ID> 20190825001 </ID>
+        <Date> Aug 25, 2019 </Date>
+        <Info>
+            Debug the random size crop
+        </Info>
+    </TODO>
+
+
 </TODOList>

@@ -68,6 +68,15 @@ class VOC_Tool():
         ptr = np.argmax(oneHot)
         return self.classes_list[ptr]
 
+    def resizeImage(self, img):
+        img_resize = cv2.resize(img, (self.input_shape[1], self.input_shape[0]))
+        # <TODO id=20190825000>
+        # <Debug>
+        #img_resize = img_resize.astype(np.float32) / 255.0
+        img_resize = img_resize.astype(np.float32)
+        # </Debug>
+        return img_resize
+        # </TODO>
     
     def getImage(self, img_ID, class_name):
         objs_list = []
@@ -86,16 +95,23 @@ class VOC_Tool():
                 objs_list.append(obj_inf)
         img_height = len(img)
         img_width = len(img[0])
-        # TODO
-        #img_resize = cv2.resize(img, (self.input_shape[1], self.input_shape[0]))
         img = img[..., ::-1]
-        #img_resize = img_resize.astype(np.float32) / 255.0
         return (img, img_height, img_width, objs_list)
 
-    def resizeImg(self, img):
-        img_resize = cv2.resize(img, (self.input_shape[1], self.input_shape[0]))
-        img_resize = img_resize.astype(np.float32) / 255.0
-        return img_resize
+    def getImage_resized(self, img_ID, class_name):
+        (img, tmp1, tmp2, tmp3) = self.getImage(img_ID, class_name)
+        img = self.resizeImage(img)
+        return img
+
+    def readImage(self, img_path):
+        img = cv2.imread(img_path).astype(np.float32)
+        img = img[..., ::-1]
+        return img
+    
+    def readImage_resized(self, img_path):
+        img = self.readImage(img_path)
+        img = self.resizeImage(img)
+        return img
 
     def random_sized_crop(self, img, targets):
         img_w = img.shape[1]
@@ -228,10 +244,11 @@ class VOC_Tool():
             y = []
             listLen = 0
             for imgID in fit_list:
-                (x_tmp, tmp1, tmp2, tmp3) = self.getImage(imgID, class_name)
                 gt = self.getGT(imgID, class_name)
-                (x_tmp, gt) = self.random_sized_crop(x_tmp, gt)
-                x_tmp = self.resizeImg(x_tmp)
+                # <TODO id=20190825001>
+                #(x_tmp, gt) = self.random_sized_crop(x_tmp, gt)
+                # </TODO>
+                x_tmp = self.getImage_resized(imgID, class_name)
                 y_tmp = self.bbox.assign_boxes(gt)
                 x.append(x_tmp)
                 y.append(y_tmp)
@@ -263,10 +280,8 @@ class VOC_Tool():
         self.initModel()
         x = []
         y = []
-        (x_tmp, tmp1, tmp2, tmp3) = self.getImage(imgID, class_name)
         gt = self.getGT(imgID, class_name)
-        (x_tmp, gt) = self.random_sized_crop(x_tmp, gt)
-        x_tmp = self.resizeImg(x_tmp)
+        x_tmp = self.getImage_resized(imgID, class_name)
         y_tmp = self.bbox.assign_boxes(gt)
         for i in range(size):
             x.append(x_tmp)
@@ -286,11 +301,8 @@ class VOC_Tool():
     
     def predict(self, img_path):
         img_list = []
-        img = cv2.imread(img_path).astype(np.float32)
-        img = img[..., ::-1]
-        #img = self.random_sized_crop(img, None)
-        img = self.resizeImg(img)
-        #img = cv2.resize(img, (self.input_shape[1], self.input_shape[0]))
+        img = self.readImg(img_path)
+        img = self.resizeImage(img)
         img_list.append(img)
         img_list = np.array(img_list, dtype=np.float32)
         img_list = applications.keras_applications.imagenet_utils.preprocess_input(img_list, data_format='channels_last')
