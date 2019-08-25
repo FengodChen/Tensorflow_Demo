@@ -11,7 +11,7 @@ def train():
         voc = VOC_Tool('../../Train/VOC2012', ['car', 'person'], (300, 300, 3))
         voc.initModel()
         #voc.loadCheckpoint('save.h5')
-        voc.fit(1024, 'car')
+        voc.fit('car')
 
 def predict():
     voc = VOC_Tool('../../Train/VOC2012', ['car', 'person'], (300, 300, 3))

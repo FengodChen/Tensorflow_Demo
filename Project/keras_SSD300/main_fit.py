@@ -31,7 +31,9 @@ class VOC_Tool():
         self.classes_inf_nameprop = {}
         # <TODO>
         #self.bbox = BBoxUtility(self.classes_num + 1, pickle.load(open('prior_boxes_ssd300.pkl', 'rb')))
-        self.prior = pickle.load(open(priorboxPath, 'rb'))
+        priorFile = open(priorboxPath, 'rb')
+        self.prior = pickle.load(priorFile)
+        priorFile.close()
         self.prior = self.prior[:6537, :]
         self.bbox = BBoxUtility(self.classes_num + 1, self.prior)
         #self.bbox = BBoxUtility(self.classes_num + 1)
@@ -51,6 +53,7 @@ class VOC_Tool():
                 class_inf_nameprop[nameProp_split[0]] = nameProp_split[1]
             
             self.classes_inf_nameprop[class_name] = class_inf_nameprop
+            classes_list_listFile.close()
     
     def getOneHot(self, class_name):
         isBack = True
@@ -171,7 +174,15 @@ class VOC_Tool():
         gt = np.array(gt_tmp, dtype=np.float32)
         return gt
 
-    def getRandomList(self, size, class_name):
+    def getList(self, class_name):
+        tmp = self.classes_inf_nameprop[class_name]
+        classList = []
+        for key in tmp:
+            if (tmp[key] == '1'):
+                classList.append(key)
+        return np.array(classList)
+
+    def getRandomChooseList(self, size, class_name):
         tmp = self.classes_inf_nameprop[class_name]
         ranList = []
         for key in tmp:
@@ -191,7 +202,7 @@ class VOC_Tool():
         file_path = self.save_path + file_name
         self.model.load_weights(file_path)
 
-    def initModel(self, save_freq=256):
+    def initModel(self, save_freq=20):
         checkfile_name = 'save.h5'
         self.callbacks = [keras.callbacks.ModelCheckpoint(self.checkpoint_path + checkfile_name,
                                                           verbose=1,
@@ -208,31 +219,42 @@ class VOC_Tool():
                       #metrics=['accuracy']
                       #metrics = loss.metrics
                       )
-    def fit(self, size, class_name, batch_size=8, epochs=10):
+    
+    def generator(self, class_name, batch_size=16):
+        fit_list = self.getList(class_name)
+        np.random.shuffle(fit_list)
+        while(True):
+            x = []
+            y = []
+            listLen = 0
+            for imgID in fit_list:
+                (x_tmp, tmp1, tmp2, tmp3) = self.getImage(imgID, class_name)
+                gt = self.getGT(imgID, class_name)
+                (x_tmp, gt) = self.random_sized_crop(x_tmp, gt)
+                x_tmp = self.resizeImg(x_tmp)
+                y_tmp = self.bbox.assign_boxes(gt)
+                x.append(x_tmp)
+                y.append(y_tmp)
+                listLen += 1
+                if(listLen == batch_size):
+                    x = np.array(x, dtype=np.float32)
+                    x = applications.keras_applications.imagenet_utils.preprocess_input(x, data_format='channels_last')
+                    y = np.array(y, dtype=np.float32)
+                    x_sent = x.copy()
+                    y_sent = y.copy()
+                    x = []
+                    y = []
+                    listLen = 0
+                    yield (x_sent, y_sent)
+
+
+
+    def fit(self, class_name, batch_size=8, epochs=30):
         self.initModel()
-        fit_list = self.getRandomList(size, class_name)
-        x = []
-        y = []
-        for imgID in fit_list:
-            (x_tmp, tmp1, tmp2, tmp3) = self.getImage(imgID, class_name)
-            gt = self.getGT(imgID, class_name)
-            (x_tmp, gt) = self.random_sized_crop(x_tmp, gt)
-            x_tmp = self.resizeImg(x_tmp)
-            y_tmp = self.bbox.assign_boxes(gt)
-            x.append(x_tmp)
-            y.append(y_tmp)
-        x = np.array(x, dtype=np.float32)
-        x = applications.keras_applications.imagenet_utils.preprocess_input(x, data_format='channels_last')
-        y = np.array(y, dtype=np.float32)
-
-        #keras.backend.get_session().run(tf.global_variables_initializer())
+        steps_per_epoch = len(self.getList(class_name)) // batch_size
         tf.compat.v1.keras.backend.get_session().run(tf.compat.v1.global_variables_initializer())
+        self.model.fit_generator(self.generator(class_name), verbose=1, epochs=epochs,steps_per_epoch=steps_per_epoch)
 
-        self.model.fit(x, y,
-                       batch_size = batch_size,
-                       verbose=1,
-                       epochs=epochs,
-                       callbacks=self.callbacks)
     def fit_single(self, class_name, imgID, size=128, batch_size=16, epochs=10):
         '''
         # Debug Function
