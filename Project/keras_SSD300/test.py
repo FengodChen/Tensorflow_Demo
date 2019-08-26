@@ -56,7 +56,7 @@ img = imp.load_img('image/2008_002197.jpg', (300, 300))
 img = imp.img_to_array(img)
 image.append(img)
 
-voc = VOC_Tool('../../Train/VOC2012', ['car', 'person'], (300, 300, 3))
+voc = VOC_Tool('../../Train/VOC2012', ['car'], (300, 300, 3))
 voc.loadCheckpoint('save.h5')
 voc.initModel()
 (img, ans) = voc.predict('image/2008_002197.jpg')

@@ -222,7 +222,7 @@ class VOC_Tool():
     def learningRateSchedule(self, epoch, decay=0.9):
         return self.base_lr * decay**(epoch)
 
-    def initModel(self, period=1):
+    def initModel(self, period=1, load_weight=True):
         checkfile_name = 'save.h5'
         self.callbacks = [keras.callbacks.ModelCheckpoint(self.checkpoint_path + checkfile_name,
                                                           verbose=1,
@@ -231,9 +231,10 @@ class VOC_Tool():
                                                           #monitor='val_loss',
                                                           #save_freq=1,
                                                           period=period,
-                                                          load_weights_on_restart=True
+                                                          load_weights_on_restart=load_weight
                                                           ),
-                          keras.callbacks.LearningRateScheduler(self.learningRateSchedule)]
+                          #keras.callbacks.LearningRateScheduler(self.learningRateSchedule)
+                          ]
         #loss = SSDLoss(alpha=1.0, neg_pos_ratio=3.0)
         self.model.compile(optimizer = keras.optimizers.Adam(lr=self.base_lr, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0),
                       loss = MultiboxLoss(self.classes_num, neg_pos_ratio=2.0).compute_loss,
@@ -272,7 +273,7 @@ class VOC_Tool():
 
 
 
-    def fit(self, class_name, batch_size=4, epochs=5):
+    def fit(self, class_name, batch_size=4, epochs=20):
         self.initModel()
         steps_per_epoch = len(self.getList(class_name)) // batch_size
         tf.compat.v1.keras.backend.get_session().run(tf.compat.v1.global_variables_initializer())
@@ -282,7 +283,7 @@ class VOC_Tool():
                                  steps_per_epoch=steps_per_epoch,
                                  callbacks=self.callbacks)
 
-    def fit_single(self, class_name, imgID, size=128, batch_size=16, epochs=10):
+    def fit_single(self, class_name, imgID, epochs=128):
         '''
         # Debug Function
         This function is used to checkout if the net work
@@ -293,9 +294,8 @@ class VOC_Tool():
         gt = self.getGT(imgID, class_name)
         x_tmp = self.getImage_resized(imgID, class_name)
         y_tmp = self.bbox.assign_boxes(gt)
-        for i in range(size):
-            x.append(x_tmp)
-            y.append(y_tmp)
+        x.append(x_tmp)
+        y.append(y_tmp)
         x = np.array(x, dtype=np.float32)
         x = applications.keras_applications.imagenet_utils.preprocess_input(x, data_format='channels_last')
         y = np.array(y, dtype=np.float32)
@@ -303,7 +303,7 @@ class VOC_Tool():
         tf.compat.v1.keras.backend.get_session().run(tf.compat.v1.global_variables_initializer())
 
         self.model.fit(x, y,
-                       batch_size = batch_size,
+                       batch_size = 1,
                        verbose=1,
                        epochs=epochs,
                        callbacks=self.callbacks
