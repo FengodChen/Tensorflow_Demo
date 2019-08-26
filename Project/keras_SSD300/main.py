@@ -17,7 +17,7 @@ def predict(img_path):
     voc = VOC_Tool('../../Train/VOC2012', ['car'], (300, 300, 3))
     voc.loadCheckpoint('save.h5')
     voc.initModel()
-    (img, ans) = voc.predict('image/2008_002197.jpg')
+    (img, ans) = voc.predict(img_path)
     voc.showPredictImg(img, ans)
 
 def debugTrain(imgID):
@@ -38,7 +38,7 @@ def debugPredict(imgID):
 
 if __name__ == "__main__":
     #train()
-    #predict()
+    #predict('image/2008_002197.jpg')
     imgID = '2008_002197'
     #debugTrain(imgID)
-    debugPredict(imgID)
+    #debugPredict(imgID)
