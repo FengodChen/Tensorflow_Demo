@@ -272,7 +272,7 @@ class VOC_Tool():
 
 
 
-    def fit(self, class_name, batch_size=4, epochs=30):
+    def fit(self, class_name, batch_size=4, epochs=5):
         self.initModel()
         steps_per_epoch = len(self.getList(class_name)) // batch_size
         tf.compat.v1.keras.backend.get_session().run(tf.compat.v1.global_variables_initializer())
