@@ -200,20 +200,20 @@ class BBoxUtility(object):
         mbox_loc = predictions[:, :, :4]
         # <TODO id=20190824000>
         # <Debug>
-        #variances = predictions[:, :, -4:]
-        #mbox_priorbox = predictions[:, :, -8:-4]
-        variances = self.priors[:, -4:]
-        mbox_priorbox = self.priors[:, -8:-4]
+        variances = predictions[:, :, -4:]
+        mbox_priorbox = predictions[:, :, -8:-4]
+        #variances = self.priors[:, -4:]
+        #mbox_priorbox = self.priors[:, -8:-4]
         # </Debug>
         mbox_conf = predictions[:, :, 4:-8]
         results = []
         for i in range(len(mbox_loc)):
             results.append([])
             # <Debug>
-            #decode_bbox = self.decode_boxes(mbox_loc[i],
-            #                                mbox_priorbox[i], variances[i])
             decode_bbox = self.decode_boxes(mbox_loc[i],
-                                            mbox_priorbox, variances)
+                                            mbox_priorbox[i], variances[i])
+            #decode_bbox = self.decode_boxes(mbox_loc[i],
+            #                                mbox_priorbox, variances)
             # </Debug>
             for c in range(self.num_classes):
                 if c == background_label_id:

@@ -42,7 +42,6 @@ import cv2
 import numpy as np
 import os
 import pickle
-import matplotlib.pyplot as plt
 from keras.preprocessing import image as imp
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '0'  # or any {'0', '2', '3'}
 image = []
@@ -59,7 +58,7 @@ image.append(img)
 voc = VOC_Tool('../../Train/VOC2012', ['car'], (300, 300, 3))
 voc.loadCheckpoint('save.h5')
 voc.initModel()
-(img, ans) = voc.predict('image/2008_002197.jpg')
+(img, ans) = voc.predict_ByPath('image/2008_002197.jpg')
 gt = voc.getAssignBoxes('2008_002197', 'car')
 # <Debug>
 # This is not very influential for the answer

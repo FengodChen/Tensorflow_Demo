@@ -17,7 +17,7 @@ def predict(img_path):
     voc = VOC_Tool('../../Train/VOC2012', ['car'], (300, 300, 3))
     voc.loadCheckpoint('save.h5')
     voc.initModel()
-    (img, ans) = voc.predict(img_path)
+    (img, ans) = voc.predict_ByPath(img_path)
     voc.showPredictImg(img, ans)
 
 def debugTrain(imgID):
@@ -33,8 +33,17 @@ def debugPredict(imgID):
     voc.loadCheckpoint('save.h5')
     voc.initModel()
     #(img, ans) = voc.predict('image/2008_002197.jpg')
-    (img, ans) = voc.predict('image/' + imgID + '.jpg')
+    (img, ans) = voc.predict_ByPath('image/' + imgID + '.jpg')
     voc.showPredictImg(img, ans)
+
+def randomPredict():
+    voc = VOC_Tool('../../Train/VOC2012', ['car'], (300, 300, 3))
+    voc.loadCheckpoint('save.h5')
+    voc.initModel()
+    img = voc.getRandomImage('car')
+    (img, ans) = voc.predict_ByImgArray(img)
+    voc.showPredictImg(img, ans)
+    
 
 if __name__ == "__main__":
     #train()
@@ -42,3 +51,4 @@ if __name__ == "__main__":
     imgID = '2008_002197'
     #debugTrain(imgID)
     #debugPredict(imgID)
+    randomPredict()

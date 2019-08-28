@@ -206,6 +206,12 @@ class VOC_Tool():
             if (tmp[key] == '1'):
                 ranList.append(key)
         return np.random.choice(ranList, size=size)
+    
+    def getRandomImage(self, class_name):
+        imgID = self.getRandomChooseList(1, class_name)[0]
+        (img, tmp1, tmp2, tmp3) = self.getImage(imgID, class_name)
+        return img
+
 
     def loadCheckpoint(self, file_name, load_path = None):
         if (load_path != None):
@@ -309,14 +315,22 @@ class VOC_Tool():
                        callbacks=self.callbacks
                        )
     
-    def predict(self, img_path):
+    def predict_ByPath(self, img_path):
         img_list = []
         img = self.readImage_resized(img_path)
         img_list.append(img)
         img_list = np.array(img_list, dtype=np.float32)
         img_list = applications.keras_applications.imagenet_utils.preprocess_input(img_list, data_format='channels_last')
+        tf.compat.v1.keras.backend.get_session().run(tf.compat.v1.global_variables_initializer())
+        ans = self.model.predict(img_list)
+        return (img, ans)
 
-        #keras.backend.get_session().run(tf.global_variables_initializer())
+    def predict_ByImgArray(self, img):
+        img_list = []
+        img = self.resizeImage(img)
+        img_list.append(img)
+        img_list = np.array(img_list, dtype=np.float32)
+        img_list = applications.keras_applications.imagenet_utils.preprocess_input(img_list, data_format='channels_last')
         tf.compat.v1.keras.backend.get_session().run(tf.compat.v1.global_variables_initializer())
         ans = self.model.predict(img_list)
         return (img, ans)
