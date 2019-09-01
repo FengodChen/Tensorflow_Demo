@@ -241,12 +241,12 @@ class VOC_Tool():
                                                           ),
                           #keras.callbacks.LearningRateScheduler(self.learningRateSchedule)
                           ]
-        loss = SSDLoss(alpha=1.0, neg_pos_ratio=3.0)
+        #loss = SSDLoss(alpha=1.0, neg_pos_ratio=3.0)
         self.model.compile(optimizer = keras.optimizers.Adam(lr=self.base_lr, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0),
-                      #loss = MultiboxLoss(self.classes_num, neg_pos_ratio=2.0).compute_loss,
-                      loss = loss.compute,
-                      #metrics=['accuracy']
-                      metrics = loss.metrics
+                      loss = MultiboxLoss(self.classes_num, neg_pos_ratio=2.0).compute_loss,
+                      #loss = loss.compute,
+                      metrics=['accuracy']
+                      #metrics = loss.metrics
                       )
     
     def generator(self, class_name, batch_size=4):
