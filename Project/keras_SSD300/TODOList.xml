@@ -70,4 +70,11 @@
         </Info>
     </TODO>
 
+    <TODO>
+        <ID> 20190918000 </ID>
+        <Date> Sep 18, 2019 </Date>
+        <Info>
+            Using MobileNetV2 maybe useful
+        </Info>
+    </TODO>
 </TODOList>

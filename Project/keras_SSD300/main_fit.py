@@ -14,7 +14,7 @@ from xml.dom import minidom
 from ssd_utils import BBoxUtility
 from ssd_fit_old import MultiboxLoss
 from ssd_fit import SSDLoss
-from ssd_model import SSD300
+from ssd_model import SSD300_vgg16
 class VOC_Tool():
     '''
     Classes List not include background class
@@ -38,7 +38,7 @@ class VOC_Tool():
         self.bbox = BBoxUtility(self.classes_num + 1, self.prior)
         #self.bbox = BBoxUtility(self.classes_num + 1)
         # </TODO>
-        self.model = SSD300(self.input_shape, self.classes_num + 1)
+        self.model = SSD300_vgg16(self.input_shape, self.classes_num + 1)
         self.do_crop = do_crop
         self.crop_area_range = crop_area_range
         self.aspect_ratio_range = aspect_ratio_range

@@ -46,8 +46,8 @@ def randomPredict():
     
 
 if __name__ == "__main__":
-    train()
-    #predict('image/2008_002197.jpg')
+    #train()
+    predict('image/2008_002197.jpg')
     imgID = '2008_002197'
     #debugTrain(imgID)
     #debugPredict(imgID)
