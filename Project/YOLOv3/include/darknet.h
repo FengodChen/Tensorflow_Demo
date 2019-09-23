@@ -525,6 +525,14 @@ typedef struct detection{
     int sort_class;
 } detection;
 
+typedef struct detection_data{
+    char label[4096];
+    double left_normalize;
+    double right_normalize;
+    double top_normalize;
+    double bot_normalize;
+} detection_data;
+
 typedef struct matrix{
     int rows, cols;
     float **vals;
@@ -733,6 +741,7 @@ data load_all_cifar10();
 box_label *read_boxes(char *filename, int *n);
 box float_to_box(float *f, int stride);
 void draw_detections(image im, detection *dets, int num, float thresh, char **names, image **alphabet, int classes);
+void get_detections(image im, detection *dets, int num, float thresh, char **names, image **alphabet, int classes, detection_data* ddata);
 
 matrix network_predict_data(network *net, data test);
 image **load_alphabet();

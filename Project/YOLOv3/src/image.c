@@ -240,8 +240,6 @@ void draw_detections(image im, detection *dets, int num, float thresh, char **na
 {
     int i,j;
 
-    printf("name(prob) | left | right | top | bottom\n");
-
     for(i = 0; i < num; ++i){
         char labelstr[4096] = {0};
         int class = -1;
@@ -254,7 +252,7 @@ void draw_detections(image im, detection *dets, int num, float thresh, char **na
                     strcat(labelstr, ", ");
                     strcat(labelstr, names[j]);
                 }
-                printf("%s(%.0f%%): ", names[j], dets[i].prob[j]*100);
+                printf("%s: %.0f%%\n", names[j], dets[i].prob[j]*100);
             }
         }
         if(class >= 0){
@@ -297,7 +295,91 @@ void draw_detections(image im, detection *dets, int num, float thresh, char **na
             if(top < 0) top = 0;
             if(bot > im.h-1) bot = im.h-1;
 
-            printf("%.2f, %.2f, %.2f, %.2f\n", left_normalize, right_normalize, top_normalize, bot_normalize);
+            draw_box_width(im, left, top, right, bot, width, red, green, blue);
+            if (alphabet) {
+                image label = get_label(alphabet, labelstr, (im.h*.03));
+                draw_label(im, top + width, left, label, rgb);
+                free_image(label);
+            }
+            if (dets[i].mask){
+                image mask = float_to_image(14, 14, 1, dets[i].mask);
+                image resized_mask = resize_image(mask, b.w*im.w, b.h*im.h);
+                image tmask = threshold_image(resized_mask, .5);
+                embed_image(tmask, im, left, top);
+                free_image(mask);
+                free_image(resized_mask);
+                free_image(tmask);
+            }
+        }
+    }
+}
+
+void get_detections(image im, detection *dets, int num, float thresh, char **names, image **alphabet, int classes, detection_data* ddata)
+{
+    int i,j;
+    //ddata = malloc(num * sizeof(detection_data));
+
+    for(i = 0; i < num; ++i){
+        char labelstr[4096] = {0};
+        int class = -1;
+        for(j = 0; j < classes; ++j){
+            if (dets[i].prob[j] > thresh){
+                if (class < 0) {
+                    strcat(labelstr, names[j]);
+                    class = j;
+                } else {
+                    strcat(labelstr, ", ");
+                    strcat(labelstr, names[j]);
+                }
+                printf("%s: %.0f%%\n", names[j], dets[i].prob[j]*100);
+            }
+        }
+        if(class >= 0){
+            int width = im.h * .006;
+
+            /*
+               if(0){
+               width = pow(prob, 1./2.)*10+1;
+               alphabet = 0;
+               }
+             */
+
+            //printf("%d %s: %.0f%%\n", i, names[class], prob*100);
+            int offset = class*123457 % classes;
+            float red = get_color(2,offset,classes);
+            float green = get_color(1,offset,classes);
+            float blue = get_color(0,offset,classes);
+            float rgb[3];
+
+            //width = prob*20+2;
+
+            rgb[0] = red;
+            rgb[1] = green;
+            rgb[2] = blue;
+            box b = dets[i].bbox;
+            //printf("%f %f %f %f\n", b.x, b.y, b.w, b.h);
+
+            double left_normalize = b.x-b.w/2.;
+            double right_normalize = b.x+b.w/2.;
+            double top_normalize   = b.y-b.h/2.;
+            double bot_normalize   = b.y+b.h/2.;
+
+            int left  = left_normalize*im.w;
+            int right = right_normalize*im.w;
+            int top   = top_normalize*im.h;
+            int bot   = bot_normalize*im.h;
+
+            if(left < 0) left = 0;
+            if(right > im.w-1) right = im.w-1;
+            if(top < 0) top = 0;
+            if(bot > im.h-1) bot = im.h-1;
+
+            strcpy(ddata[i].label, labelstr);
+            ddata[i].left_normalize = left_normalize;
+            ddata[i].right_normalize = right_normalize;
+            ddata[i].top_normalize = top_normalize;
+            ddata[i].bot_normalize = bot_normalize;
+            //printf("%.2f, %.2f, %.2f, %.2f\n", left_normalize, right_normalize, top_normalize, bot_normalize);
 
             draw_box_width(im, left, top, right, bot, width, red, green, blue);
             if (alphabet) {
