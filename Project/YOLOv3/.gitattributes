@@ -787,3 +787,6 @@ data/labels/123_0.png filter=lfs diff=lfs merge=lfs -text
 data/labels/123_4.png filter=lfs diff=lfs merge=lfs -text
 data/labels/64_5.png filter=lfs diff=lfs merge=lfs -text
 predictions.jpg filter=lfs diff=lfs merge=lfs -text
+data/class.jpg filter=lfs diff=lfs merge=lfs -text
+data/night1.jpg filter=lfs diff=lfs merge=lfs -text
+data/night2.jpg filter=lfs diff=lfs merge=lfs -text
